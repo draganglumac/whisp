@@ -42,5 +42,6 @@ void *multicast_pulse(void *args)
 	char *buffer;
 	size_t len = protocol_get_multicast_pulse_data(&buffer);
 	jnx_socket_udp_send(data->s,data->bgroup,data->port,buffer,len);	
+	free(buffer);
 	return 0;
 }

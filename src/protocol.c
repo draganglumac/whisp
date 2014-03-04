@@ -15,6 +15,7 @@
  *
  * =====================================================================================
  */
+#include <jnxc_headers/jnxmem.h>
 #include <stdlib.h>
 #include "protocol.h"
 
@@ -32,8 +33,15 @@ size_t protocol_get_multicast_pulse_data(char **data)
 {
 	size_t s = 0;
 
-
-
-
+	char buffer[1024];
+	bzero(buffer,1024);
+	const char *data_frame = "[%s][%s]";
+	sprintf(buffer,data_frame,guid_string,"PULSE");
+	
+	s = strlen(buffer);
+	
+	*data = JNX_MEM_CALLOC(s,sizeof(char));
+	memcpy(*data,buffer,s);
+	assert(s != 0);
 	return s;
 }	
