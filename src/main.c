@@ -23,6 +23,7 @@
 #include <uuid/uuid.h>
 #define CONF "conf/settings.conf"
 #include <unistd.h>
+#include "protocol.h"
 #include "comms.h"
 void print_config(jnx_hashmap *config)
 {
@@ -71,14 +72,22 @@ void generate_guid(jnx_hashmap *config)
 }
 int main(int argc, char **argv)
 {
+	jnx_mem_print_to_file("logs/mem.file");
+	
 	jnx_hashmap *configuration = jnx_file_read_kvp(CONF,1024,"=");
+	
 	assert(configuration);
+	
 	print_config(configuration);
+	
 	resolve_interface_address(configuration);	
+	
 	generate_guid(configuration);
+
 	comms_setup(configuration);
 
-	jnx_mem_print_to_file("logs/mem.file");
+	protocol_setup(configuration);
+
 	//Initial setup done
 	comms_start();	
 	return 0;

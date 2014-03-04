@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include "networkhandlers.h"
 #include <jnxc_headers/jnxmem.h>
+
 void multicast_listener(char *msg, size_t len, char *ip)
 {
 	printf("[%s]\n",msg);
@@ -37,6 +38,9 @@ void *multicast_pulse(void *args)
 	thread_data *data = (thread_data*)args;
 
 	assert(data->bgroup);
-	jnx_socket_udp_send(data->s,data->bgroup,data->port,"hi",2);	
+
+	char *buffer;
+	size_t len = protocol_get_multicast_pulse_data(&buffer);
+	jnx_socket_udp_send(data->s,data->bgroup,data->port,buffer,len);	
 	return 0;
 }

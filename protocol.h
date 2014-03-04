@@ -6,7 +6,7 @@
  *    Description:  
  *
  *        Version:  1.0
- *        Created:  03/03/14 18:09:10
+ *        Created:  03/04/14 08:18:53
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -15,14 +15,14 @@
  *
  * =====================================================================================
  */
-#ifndef __PROTOCOL_H__
-#define __PROTOCOL_H__
-#include <jnxc_headers/jnxhash.h>
+#ifndef __PROTOCOL_H_
+#define __PROTOCOL_H_
 
 
-void protocol_setup(jnx_hashmap *configuration); 
+//============ UNENCRYPTED PRE-HANDSHAKE IN THE CLEAR ======================
 
-size_t protocol_get_multicast_pulse_data(char **data); 
 
+
+//============ UNENCRYPTED PRE-HANDSHAKE IN THE CLEAR ======================
 
 #endif

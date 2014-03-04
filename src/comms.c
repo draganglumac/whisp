@@ -74,9 +74,9 @@ void comms_setup(jnx_hashmap *configuration)
 	interval = cinterval;
 	multicast_pulse_out = jnx_socket_udp_create(family);
 	printf("Enabling multicast sender...\n");
-	//Note: loopback has been disabled
+	//Note: loopback has been ENABLED
 	//It is useful to enable for local debugging
-	jnx_socket_udp_enable_multicast_send(multicast_pulse_out,ip,1);
+	jnx_socket_udp_enable_multicast_send(multicast_pulse_out,ip,0);
 	multicast_pulse_in = jnx_socket_udp_create(family);
 	printf("Enabling multicast listener...\n");
 	jnx_socket_udp_enable_multicast_listen(multicast_pulse_in,ip,bgroup);
