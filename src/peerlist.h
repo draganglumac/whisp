@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  comms.h
+ *       Filename:  peerlist.h
  *
  *    Description:  
  *
  *        Version:  1.0
- *        Created:  03/03/14 18:06:58
+ *        Created:  03/04/14 18:31:09
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -15,10 +15,15 @@
  *
  * =====================================================================================
  */
+#ifndef __PEERLIST_H__
+#define __PEERLIST_H__
 
-#include <jnxc_headers/jnxnetwork.h>
-#include <jnxc_headers/jnxsocket.h>
-#include <jnxc_headers/jnxhash.h>
+int peerlist_check_peer(char *guid);
 
-void comms_setup(jnx_hashmap *configuration);
-void comms_start();
+int peerlist_add_peer(char *raw);
+
+int peerlist_remove_peer(char *guid);
+
+int peerlist_update_peer(char *guid);
+
+#endif

@@ -1,0 +1,4 @@
+sudo ip li add br0 type bridge
+sudo ip li set dev enp2s0 master br0
+sudo ip link set enp2s0 up
+sudo ip addr add 192.168.1.2/24 broadcast 192.168.1.255 dev enp2s0

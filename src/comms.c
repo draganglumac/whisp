@@ -19,12 +19,13 @@
 #include <stdio.h>
 #include <jnxc_headers/jnxthread.h>
 #include <jnxc_headers/jnxmem.h>
-#include "networkhandlers.h"
+#include <jnxc_headers/jnxsocket.h>
 #include "comms.h"
+#include "protocol.h"
 #define ASYNC_START(X,Y)\
 	jnx_thread_create_disposable(X,Y);
 
-state current_state;
+typedef struct thread_data { char* port; jnx_socket *s; char *bgroup; } thread_data;
 jnx_thread_mutex comms_lock;
 static jnx_hashmap *configuration;
 typedef int clock_interval;
@@ -37,22 +38,33 @@ jnx_socket *multicast_pulse_in;
 static thread_data *multicast_listen_thrdata;
 static thread_data *multicast_send_thrdata;
 
-void hint_new_current_state(state hint)
+///////// THREAD TWO ///////
+void multicast_listener(char *msg, size_t len, char *ip)
 {
-	jnx_thread_trylock(&comms_lock);
-	current_state = hint;
-	jnx_thread_unlock(&comms_lock);
+	printf("[%s]\n",msg);
 }
-state comms_current_state()
+void *multicast_listen_start(void *args)
 {
-	jnx_thread_trylock(&comms_lock);
-	state r = current_state;
-	jnx_thread_unlock(&comms_lock);
-	return r;
+	thread_data *data = (thread_data*)args;
+	jnx_socket_udp_listen(data->s,data->port,24,multicast_listener);
+	return 0;
 }
+////////////////////////////
+
+///////ASYNC THREAD////////
+void *multicast_pulse(void *args)
+{
+	thread_data *data = (thread_data*)args;
+	char *buffer;
+	size_t len = protocol_get_multicast_pulse_data(&buffer);
+	jnx_socket_udp_send(data->s,data->bgroup,data->port,buffer,len);
+	return 0;
+}
+///////////////////////////
+
+
 void comms_setup(jnx_hashmap *configuration)
 {
-	hint_new_current_state(SEARCH);
 	configuration = configuration;
 
 	char *af = jnx_hash_get(configuration,"ADDFAMILY");
@@ -93,31 +105,20 @@ void comms_setup(jnx_hashmap *configuration)
 }
 void comms_start()
 {
-	while(current_state != EXITING){
-		switch(current_state)
+	while(1){
+		if(!start_t)
 		{
-			case SEARCH:
-				if(!start_t)
-				{
-					printf("Pulsing multicast beacon...\n");
-					ASYNC_START(multicast_pulse,multicast_send_thrdata);
-					start_t = clock();
-				}else{
-					end_t = clock();
-					if(((end_t - start_t) / CLOCKS_PER_SEC) > interval)
-					{
-						printf("Pulsing multicast beacon...\n");
-						ASYNC_START(multicast_pulse,multicast_send_thrdata);
-						start_t = clock();
-					}
-				}			
-				break;
-			case DISCOVERY:
-
-				break;
-			case MESSAGE:
-
-				break;
+			printf("Pulsing multicast beacon...\n");
+			ASYNC_START(multicast_pulse,multicast_send_thrdata);
+			start_t = clock();
+		}else{
+			end_t = clock();
+			if(((end_t - start_t) / CLOCKS_PER_SEC) > interval)
+			{
+				printf("Pulsing multicast beacon...\n");
+				ASYNC_START(multicast_pulse,multicast_send_thrdata);
+				start_t = clock();
+			}
 		}
 	}
 }
