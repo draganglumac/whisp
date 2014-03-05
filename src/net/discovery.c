@@ -70,7 +70,7 @@ void *multicast_serialization_process(void *args) {
         break;
     case S_OKAY:
         if(p) {
-            if(!peerstore_check_peer(raw_peer->guid)) {
+            if(!peerstore_check_peer(rp->guid)) {
 				peerstore_add_peer(rp);
             }
             JNX_MEM_FREE(rp);
