@@ -1,7 +1,7 @@
 /*
  * =====================================================================================
  *
- *       Filename:  comms.c
+ *       Filename:  discovery.c
  *
  *    Description:  
  *
@@ -20,13 +20,13 @@
 #include <jnxc_headers/jnxthread.h>
 #include <jnxc_headers/jnxmem.h>
 #include <jnxc_headers/jnxsocket.h>
-#include "comms.h"
-#include "protocol.h"
+#include "discovery.h"
+#include "serialization.h"
 #define ASYNC_START(X,Y)\
 	jnx_thread_create_disposable(X,Y);
 
 typedef struct thread_data { char* port; jnx_socket *s; char *bgroup; } thread_data;
-jnx_thread_mutex comms_lock;
+jnx_thread_mutex discovery_lock;
 static jnx_hashmap *configuration;
 typedef int clock_interval;
 static clock_interval interval = 5;
@@ -56,14 +56,12 @@ void *multicast_pulse(void *args)
 {
 	thread_data *data = (thread_data*)args;
 	char *buffer;
-	size_t len = protocol_get_multicast_pulse_data(&buffer);
+	size_t len = get_pulse_data(&buffer);
 	jnx_socket_udp_send(data->s,data->bgroup,data->port,buffer,len);
 	return 0;
 }
 ///////////////////////////
-
-
-void comms_setup(jnx_hashmap *configuration)
+void discovery_setup(jnx_hashmap *configuration)
 {
 	configuration = configuration;
 
@@ -103,7 +101,7 @@ void comms_setup(jnx_hashmap *configuration)
 	multicast_send_thrdata->bgroup = bgroup;
 	ASYNC_START(multicast_listen_start,multicast_listen_thrdata);				
 }
-void comms_start()
+void discovery_start()
 {
 	while(1){
 		if(!start_t)
@@ -122,7 +120,7 @@ void comms_start()
 		}
 	}
 }
-void comms_teardown()
+void discovery_teardown()
 {
 
 }

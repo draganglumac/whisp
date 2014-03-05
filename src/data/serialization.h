@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  peerlist.h
+ *       Filename:  protocol.h
  *
  *    Description:  
  *
  *        Version:  1.0
- *        Created:  03/04/14 18:31:09
+ *        Created:  03/03/14 18:09:10
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -15,15 +15,14 @@
  *
  * =====================================================================================
  */
-#ifndef __PEERLIST_H__
-#define __PEERLIST_H__
+#ifndef __SERIALISER_H__
+#define __SERIALISER_H__
+#include <jnxc_headers/jnxhash.h>
 
-int peerlist_check_peer(char *guid);
 
-int peerlist_add_peer(char *raw);
+void serialiser_setup(jnx_hashmap *configuration); 
 
-int peerlist_remove_peer(char *guid);
+size_t get_pulse_data(char **data); 
 
-int peerlist_update_peer(char *guid);
 
 #endif

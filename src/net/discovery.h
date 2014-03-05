@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  protocol.h
+ *       Filename:  discovery.h
  *
  *    Description:  
  *
  *        Version:  1.0
- *        Created:  03/03/14 18:09:10
+ *        Created:  03/03/14 18:06:58
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -15,14 +15,10 @@
  *
  * =====================================================================================
  */
-#ifndef __PROTOCOL_H__
-#define __PROTOCOL_H__
+
+#include <jnxc_headers/jnxnetwork.h>
+#include <jnxc_headers/jnxsocket.h>
 #include <jnxc_headers/jnxhash.h>
 
-
-void protocol_setup(jnx_hashmap *configuration); 
-
-size_t protocol_get_multicast_pulse_data(char **data); 
-
-
-#endif
+void discovery_setup(jnx_hashmap *configuration);
+void discovery_start();

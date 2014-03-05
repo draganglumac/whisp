@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  peerlist.c
+ *       Filename:  protocols.h
  *
  *    Description:  
  *
  *        Version:  1.0
- *        Created:  03/04/14 18:31:23
+ *        Created:  03/05/14 08:28:10
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -15,23 +15,9 @@
  *
  * =====================================================================================
  */
-#include <stdlib.h>
-#include "peerlist.h"
+#ifndef __PROTOCOLS_H__
+#define __PROTOCOLS_H__
 
-int peerlist_add_peer(char *raw)
-{
+static const char *PROTOCOL = "[%s]";
 
-}
-
-int peerlist_remove_peer(char *guid)
-{
-
-}
-int peerlist_update_peer(char *guid)
-{
-
-}
-int peerlist_check_peer(char *guid)
-{
-
-}
+#endif
