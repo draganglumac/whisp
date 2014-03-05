@@ -23,33 +23,38 @@
 jnx_thread_mutex peer_lock;
 static char* guid_string = NULL;
 #define MAX_STR 1024
-
+#define GUID_KEY "GUID"
+#define COMMAND_KEY "COMMAND"
+#define PEERAGE_KEY "PEERAGE"
 void serialiser_setup(jnx_hashmap *configuration) {
     if(!guid_string) {
         guid_string = jnx_hash_get(configuration,"GUID");
         assert(guid_string);
     }
 }
-char *get_peers_as_string()
-{
-	char *out = NULL; 
-	jnx_thread_lock(&peer_lock);
-	out = peerstore_get_peerstring();
-	jnx_thread_unlock(&peer_lock);
-	return out;
-}
-size_t get_pulse_data(char **data) {
+size_t serialize_data(char **outbuffer) {
     size_t s = 0;
-	char *peerstring = get_peers_as_string();
     char buffer[1024];
     bzero(buffer,1024);
-    const char *data_frame = "[GUID:%s][COMMAND:%s][PEERAGE:%s]";
-    sprintf(buffer,data_frame,guid_string,"PULSE",peerstring);
-
+    const char *data_frame = "GUID:%s:COMMAND:%s:PEERAGE:%s:";
+    sprintf(buffer,data_frame,guid_string,"PULSE","NULL");
     s = strlen(buffer);
-
-    *data = JNX_MEM_CALLOC(s,sizeof(char));
-    memcpy(*data,buffer,s);
+    *outbuffer = JNX_MEM_CALLOC(s,sizeof(char));
+    memcpy(*outbuffer,buffer,s);
     assert(s != 0);
     return s;
+
 }
+S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_message_len, char *interface_ip) {
+
+    if(raw_message_len == 0) {
+        return S_MALFORMED;
+    }
+
+
+
+    return S_OKAY;
+}
+
+
+
