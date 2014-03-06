@@ -1,4 +1,4 @@
-all: setup artifact teardown
+all: setup artifact
 setup:
 	mkdir -p build
 	cp src/**/*.c build
