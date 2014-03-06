@@ -23,7 +23,7 @@
 #include <jnxc_headers/jnxlog.h>
 #include <jnxc_headers/jnxthread.h>
 #include <uuid/uuid.h>
-#define CONF "conf/settings.conf"
+#define CONFIG_PATH "conf/settings.conf"
 #include <unistd.h>
 #include "serialization.h"
 #include "userinput.h"
@@ -70,7 +70,7 @@ void generate_guid(jnx_hashmap *config) {
 int main(int argc, char **argv) {
     jnx_mem_print_to_file("logs/mem.file");
 	jnx_log_file_setup("logs/current.log");
-    jnx_hashmap *configuration = jnx_file_read_kvp(CONF, 1024, "=");
+    jnx_hashmap *configuration = jnx_file_read_kvp(CONFIG_PATH, 1024, "=");
 
     assert(configuration);
 

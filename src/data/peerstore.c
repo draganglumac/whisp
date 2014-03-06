@@ -65,9 +65,12 @@ void deinitialise_store() {
 
 }
 int peerstore_check_peer(char *guid) {
-    JNX_LOGF("Checking for peer %s\n",guid);
+    JNX_LOGC("Checking for peer %s\n",guid);
     if(!local_peerstore) return 0;
-    int found = 0;
+	if(local_peerstore->count == 0) {
+		return 0;
+	}
+	int found = 0;
     jnx_list *keylist = jnx_list_create();
     jnx_btree_keys(local_peerstore->peer_tree,keylist);
 
@@ -76,7 +79,7 @@ int peerstore_check_peer(char *guid) {
         char *current_key = keylist->head->_data;
         if(strcmp(guid,current_key) == 0) {
             found = 1;
-            JNX_LOGF("FOUND %s already in peerstore\n",guid);
+            JNX_LOGC("FOUND %s already in peerstore\n",guid);
             break;
         }
         keylist->head = keylist->head->next_node;
@@ -84,8 +87,14 @@ int peerstore_check_peer(char *guid) {
 
     keylist->head = reset;
     jnx_list_destroy(&keylist);
-    JNX_LOGF("Peer found %d\n", found  );
+    JNX_LOGC("Peer found %d\n", found  );
     return found;
+}
+int peerstore_get_value(char *guid,char **public_key_str) {
+
+	JNX_LOGC("Hit peer store get value for %s\n",guid);
+	//TODO: finish
+	return -1;
 }
 char* peerstore_get_peerstring() {
     if(!local_peerstore) return "None";
@@ -117,8 +126,8 @@ int peerstore_add_peer(raw_peer *rp) {
     if(!local_peerstore) {
         initialise_store();
     }
-    JNX_LOGF("Adding peer %s\n",rp->guid);
-    jnx_btree_add(local_peerstore->peer_tree,rp->guid,rp->ip);
+    JNX_LOGC("Adding peer %s\n",rp->guid);
+    jnx_btree_add(local_peerstore->peer_tree,rp->guid,"NO RSA DATA STORED YET");
     local_peerstore->count++;
 }
 int peerstore_remove_peer(char *guid) {

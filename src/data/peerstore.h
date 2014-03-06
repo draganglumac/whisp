@@ -18,17 +18,21 @@
 #ifndef __PEERSTORE_H__
 #define __PEERSTORE_H__
 #include <jnxc_headers/jnxbtree.h>
-
-typedef struct raw_peer{
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
+typedef struct raw_peer
+{
 	char *guid;
-	char *command; 
-	char *ip; 
+	char *command;
+	char *ip;
 	char *peerstring;
-}raw_peer;
+} raw_peer;
 
 int peerstore_check_peer(char *guid);
 
 char* peerstore_get_peerstring();
+
+int peerstore_get_value(char *guid, char **public_key_str);
 
 int peerstore_add_peer(raw_peer *rp);
 
@@ -38,4 +42,5 @@ int peerstore_update_peer(char *guid);
 
 
 #endif
+
 

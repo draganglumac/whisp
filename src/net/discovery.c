@@ -24,19 +24,7 @@
 #include "discovery.h"
 #include "serialization.h"
 #include "peerstore.h"
-#define ASYNC_START(X,Y)\
-	jnx_thread_create_disposable(X,Y);
 
-typedef struct thread_data {
-    char* port;
-    jnx_socket *s;
-    char *bgroup;
-    //multicasting information
-    size_t len;
-    char *ip;
-    char *msg;
-
-} thread_data;
 jnx_thread_mutex discovery_lock;
 static jnx_hashmap *configuration;
 typedef int clock_interval;
@@ -45,7 +33,7 @@ static clock_t start_t = NULL;
 static clock_t end_t = NULL;
 jnx_socket *multicast_pulse_out;
 jnx_socket *multicast_pulse_in;
-
+static jnx_thread_mutex clock_lock;
 static thread_data *multicast_listen_thrdata;
 static thread_data *multicast_send_thrdata;
 
@@ -76,9 +64,9 @@ void *multicast_serialization_process(void *args) {
                 } else {
                     JNX_LOGF("Existing peer found %s\n",rp->guid);
                 }
-            } else { 
-				JNX_LOGF("Ignoring my guid...\n");
-			}
+            } else {
+                JNX_LOGF("Ignoring my guid...\n");
+            }
             JNX_MEM_FREE(rp);
         } else {
             JNX_LOGF("Error raw_peer data is null\n");
@@ -108,7 +96,8 @@ void *multicast_listen_start(void *args) {
 
 ///////ASYNC THREAD////////
 void *multicast_pulse(void *args) {
-    thread_data *data = (thread_data*)args;
+	printf("[Multicast pulse]\n");
+	thread_data *data = (thread_data*)args;
     char *buffer;
     size_t len = serialize_data(&buffer,jnx_hash_get(configuration,"GUID"),"PULSE","PEER-NULL");
     jnx_socket_udp_send(data->s,data->bgroup,data->port,buffer,len);
@@ -155,27 +144,31 @@ void discovery_setup(jnx_hashmap *config) {
     ASYNC_START(multicast_listen_start,multicast_listen_thrdata);
 }
 void* discovery_start(void *args) {
-
-    printf("My guid %s\n",jnx_hash_get(configuration,"GUID"));
     while(1) {
         if(!start_t) {
-            printf("Pulsing multicast beacon...\n");
+            jnx_thread_lock(&clock_lock);
             ASYNC_START(multicast_pulse,multicast_send_thrdata);
             start_t = clock();
+            jnx_thread_unlock(&clock_lock);
         } else {
+            jnx_thread_lock(&clock_lock);
             end_t = clock();
+            jnx_thread_unlock(&clock_lock);
             if(((end_t - start_t) / CLOCKS_PER_SEC) > interval) {
-                printf("Pulsing multicast beacon...\n");
+                jnx_thread_lock(&clock_lock);
                 ASYNC_START(multicast_pulse,multicast_send_thrdata);
                 start_t = clock();
+                jnx_thread_unlock(&clock_lock);
             }
         }
     }
-	return 0;
+    return 0;
 }
 void discovery_teardown() {
 
 }
+
+
 
 
 
