@@ -53,7 +53,7 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
 
 
 
-    return S_OKAY;
+    return S_GENERAL_ERROR;
 }
 
 

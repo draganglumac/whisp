@@ -52,6 +52,7 @@ void initialise_store() {
     if(!local_peerstore) {
         local_peerstore = JNX_MEM_MALLOC(sizeof(local_peerstore));
         local_peerstore->peer_tree = jnx_btree_create(6,evaluate);
+        local_peerstore->count = 0;
     }
 }
 void deinitialise_store() {
@@ -59,9 +60,27 @@ void deinitialise_store() {
 
 }
 int peerstore_check_peer(char *guid) {
-	JNX_LOGC("Checking for peer %s\n",guid);
+    JNX_LOGC("Checking for peer %s\n",guid);
     if(!local_peerstore) return 0;
+	int found = 0;
+	jnx_list *keylist = jnx_list_create();
+	jnx_btree_keys(local_peerstore->peer_tree,keylist);
 
+	jnx_node *reset = keylist->head;
+	while(keylist->head)
+	{
+		char *current_key = keylist->head->_data;
+		if(strcmp(guid,current_key) == 0)
+		{
+			found = 1;
+			break;
+		}
+		keylist->head = keylist->head->next_node;
+	}
+
+	keylist->head = reset;
+	jnx_list_destroy(&keylist);
+	return found;
 }
 char* peerstore_get_peerstring() {
     if(!local_peerstore) return "None";
@@ -75,8 +94,10 @@ int peerstore_add_peer(raw_peer *rp) {
     if(!local_peerstore) {
         initialise_store();
     }
-}
+	JNX_LOGC("Adding peer %s\n",rp->guid);	
+	jnx_btree_add(local_peerstore->peer_tree,rp->guid,rp->ip);
 
+}
 int peerstore_remove_peer(char *guid) {
     if(!local_peerstore) return -1;
 
@@ -88,6 +109,7 @@ int peerstore_update_peer(char *guid) {
 
 
 }
+
 
 
 
