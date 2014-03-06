@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  discovery.h
+ *       Filename:  userinput.h
  *
  *    Description:  
  *
  *        Version:  1.0
- *        Created:  03/03/14 18:06:58
+ *        Created:  03/06/14 16:39:09
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -15,10 +15,10 @@
  *
  * =====================================================================================
  */
+#ifndef __USERINPUT_H__
+#define __USERINPUT_H__
 
-#include <jnxc_headers/jnxnetwork.h>
-#include <jnxc_headers/jnxsocket.h>
-#include <jnxc_headers/jnxhash.h>
+void user_input_loop();
 
-void discovery_setup(jnx_hashmap *configuration);
-void *discovery_start(void *args);
+#endif
+

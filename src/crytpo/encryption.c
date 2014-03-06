@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  discovery.h
+ *       Filename:  encryption.c
  *
  *    Description:  
  *
  *        Version:  1.0
- *        Created:  03/03/14 18:06:58
+ *        Created:  03/06/14 16:23:08
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -15,10 +15,5 @@
  *
  * =====================================================================================
  */
-
-#include <jnxc_headers/jnxnetwork.h>
-#include <jnxc_headers/jnxsocket.h>
-#include <jnxc_headers/jnxhash.h>
-
-void discovery_setup(jnx_hashmap *configuration);
-void *discovery_start(void *args);
+#include <stdlib.h>
+#include "encryption.h"

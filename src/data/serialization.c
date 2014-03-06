@@ -33,12 +33,12 @@ void serialiser_setup(jnx_hashmap *configuration) {
         assert(guid_string);
     }
 }
-size_t serialize_data(char **outbuffer) {
+size_t serialize_data(char **outbuffer,char *guid,char *command, char *peerage) {
     size_t s = 0;
     char buffer[1024];
     bzero(buffer,1024);
     const char *data_frame = "GUID:%s:COMMAND:%s:PEERAGE:%s:";
-    sprintf(buffer,data_frame,guid_string,"PULSE","NULL");
+    sprintf(buffer,data_frame,guid,command,peerage);
     s = strlen(buffer);
     *outbuffer = JNX_MEM_CALLOC(s,sizeof(char));
     memcpy(*outbuffer,buffer,s);

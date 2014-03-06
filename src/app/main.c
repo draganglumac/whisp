@@ -20,10 +20,13 @@
 #include <jnxc_headers/jnxfile.h>
 #include <jnxc_headers/jnxnetwork.h>
 #include <jnxc_headers/jnxmem.h>
+#include <jnxc_headers/jnxlog.h>
+#include <jnxc_headers/jnxthread.h>
 #include <uuid/uuid.h>
 #define CONF "conf/settings.conf"
 #include <unistd.h>
 #include "serialization.h"
+#include "userinput.h"
 #include "discovery.h"
 void print_config(jnx_hashmap *config) {
     const char **keys;
@@ -66,7 +69,7 @@ void generate_guid(jnx_hashmap *config) {
 }
 int main(int argc, char **argv) {
     jnx_mem_print_to_file("logs/mem.file");
-
+	jnx_log_file_setup("logs/current.log");
     jnx_hashmap *configuration = jnx_file_read_kvp(CONF, 1024, "=");
 
     assert(configuration);
@@ -82,7 +85,10 @@ int main(int argc, char **argv) {
     serialiser_setup(configuration);
 
     //Initial setup done
-    discovery_start();
-    return 0;
+	jnx_thread_create_disposable(discovery_start,NULL);
+
+	user_input_loop();
+
+	return 0;
 }
 

@@ -55,18 +55,18 @@ static thread_data *multicast_send_thrdata;
 void *multicast_serialization_process(void *args) {
     thread_data *p = (thread_data*)args;
     raw_peer *rp = NULL;
-    JNX_LOGC("Deserializing [%s %d %s]\n",p->msg,p->len,p->ip);
+    JNX_LOGF("Deserializing [%s %d %s]\n",p->msg,p->len,p->ip);
     S_TYPES ret = deserialize_data(&rp,p->msg,p->len,p->ip);
     JNX_MEM_FREE(p);
     switch(ret) {
     case S_MALFORMED:
-        JNX_LOGC("Malformed deserialization data...\n");
+        JNX_LOGF("Malformed deserialization data...\n");
         break;
     case S_GENERAL_ERROR:
-        JNX_LOGC("General error deserializing...\n");
+        JNX_LOGF("General error deserializing...\n");
         break;
     case S_UNKNOWN:
-        JNX_LOGC("Unknown error deserializing...\n");
+        JNX_LOGF("Unknown error deserializing...\n");
         break;
     case S_OKAY:
         if(p) {
@@ -74,14 +74,14 @@ void *multicast_serialization_process(void *args) {
                 if(!peerstore_check_peer(rp->guid)) {
                     peerstore_add_peer(rp);
                 } else {
-                    JNX_LOGC("Existing peer found %s\n",rp->guid);
+                    JNX_LOGF("Existing peer found %s\n",rp->guid);
                 }
             } else { 
-				JNX_LOGC("Ignoring my guid...\n");
+				JNX_LOGF("Ignoring my guid...\n");
 			}
             JNX_MEM_FREE(rp);
         } else {
-            JNX_LOGC("Error raw_peer data is null\n");
+            JNX_LOGF("Error raw_peer data is null\n");
         }
         break;
     }
@@ -92,7 +92,7 @@ void *multicast_serialization_process(void *args) {
 
 ///////// THREAD TWO ///////
 void multicast_listener(char *msg, size_t len, char *ip) {
-    JNX_LOGC("Multicast listener got [%s]\n",msg);
+    JNX_LOGF("Multicast listener got [%s]\n",msg);
     thread_data *thr = JNX_MEM_MALLOC(sizeof(thread_data));
     thr->len = len;
     thr->msg = msg;
@@ -110,7 +110,7 @@ void *multicast_listen_start(void *args) {
 void *multicast_pulse(void *args) {
     thread_data *data = (thread_data*)args;
     char *buffer;
-    size_t len = serialize_data(&buffer);
+    size_t len = serialize_data(&buffer,jnx_hash_get(configuration,"GUID"),"PULSE","PEER-NULL");
     jnx_socket_udp_send(data->s,data->bgroup,data->port,buffer,len);
     JNX_MEM_FREE(buffer);
     return 0;
@@ -154,7 +154,7 @@ void discovery_setup(jnx_hashmap *config) {
     multicast_send_thrdata->bgroup = bgroup;
     ASYNC_START(multicast_listen_start,multicast_listen_thrdata);
 }
-void discovery_start() {
+void* discovery_start(void *args) {
 
     printf("My guid %s\n",jnx_hash_get(configuration,"GUID"));
     while(1) {
@@ -171,6 +171,7 @@ void discovery_start() {
             }
         }
     }
+	return 0;
 }
 void discovery_teardown() {
 
