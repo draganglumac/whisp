@@ -27,6 +27,7 @@ typedef struct raw_peer
 	char *guid;
 	char *command;
 	char *ip;
+	char *port;
 	char *peerstring;
 } raw_peer;
 

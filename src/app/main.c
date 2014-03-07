@@ -84,7 +84,7 @@ int random_in_range(unsigned int min, unsigned int max) {
 }
 void generate_port(jnx_hashmap *config) {
 
-	int r = random_in_range(9000,9999);
+	int r = random_in_range(49152,65535);
 	char *buffer = JNX_MEM_MALLOC(56);
 	sprintf(buffer,"%d",r);
 	printf("Adding port %s to map\n",buffer);

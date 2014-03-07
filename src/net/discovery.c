@@ -60,7 +60,8 @@ void *multicast_serialization_process(void *args) {
         assert(rp->guid);
         assert(rp->command);
         assert(rp->ip);
-        if(strcmp(rp->guid,guid_string) != 0) {
+    	assert(rp->port);
+		if(strcmp(rp->guid,guid_string) != 0) {
 			raw_peer *handle;
             if(!peerstore_check_peer(rp->guid,&handle)) {
                 peerstore_add_peer(rp);
@@ -99,7 +100,8 @@ void *multicast_listen_start(void *args) {
 void *multicast_pulse(void *args) {
     thread_data *data = (thread_data*)args;
     char *buffer;
-    size_t len = serialize_data(&buffer,jnx_hash_get(configuration,"GUID"),"PULSE","PEER-NULL");
+    size_t len = serialize_data(&buffer,jnx_hash_get(configuration,"GUID"),"PULSE",
+			jnx_hash_get(configuration,"TPORT"),"PEER-NULL");
     jnx_socket_udp_send(data->s,data->bgroup,data->port,buffer,len);
     JNX_MEM_FREE(buffer);
     return 0;

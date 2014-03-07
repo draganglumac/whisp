@@ -50,9 +50,9 @@ void* connectioncontrol_setup(void *args) {
 
 	session_tcp_listener = jnx_socket_tcp_create(AF_INET);
 	session_tcp_connector = jnx_socket_tcp_create(AF_INET);
-//	JNX_LOGC("Starting TCP listener socket on %s\n",jnx_hash_get(configuration,"TPORT"));
-//	jnx_socket_tcp_listen(session_tcp_connector,jnx_hash_get(configuration,"TPORT"),10,
-//			session_listener_callback);
+	JNX_LOGC("Starting TCP listener socket on %s\n",jnx_hash_get(configuration,"TPORT"));
+	jnx_socket_tcp_listen(session_tcp_connector,jnx_hash_get(configuration,"TPORT"),10,
+			session_listener_callback);
 }
 int connectioncontrol_isconnected(void) {
 

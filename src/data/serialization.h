@@ -28,7 +28,7 @@ void serializer_setup(jnx_hashmap *configuration);
 
 S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_message_len, char *interface_ip);
 
-size_t serialize_data(char **outbuffer,char *guid,char *command, char *peerage);
+size_t serialize_data(char **outbuffer,char *guid,char *command,char *port, char *peerage);
 
 
 #endif
