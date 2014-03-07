@@ -68,16 +68,41 @@ void generate_guid(jnx_hashmap *config) {
     assert(buffer);
     jnx_hash_put(config, "GUID", strdup(buffer));
 }
+int random_in_range(unsigned int min, unsigned int max) {
+	
+	srand(time(NULL));	
+	int base_random = rand();
+	if(RAND_MAX == base_random) return random_in_range(min,max);
+	int range = max - min,
+		remainder = RAND_MAX % range,
+		bucket = RAND_MAX / range;
+	if(base_random < RAND_MAX - remainder) {
+		return min + base_random / bucket;
+	} else {
+		return random_in_range(min,max);
+	}
+}
+void generate_port(jnx_hashmap *config) {
+
+	int r = random_in_range(9000,9999);
+	char *buffer = JNX_MEM_MALLOC(56);
+	sprintf(buffer,"%d",r);
+	printf("Adding port %s to map\n",buffer);
+	jnx_hash_put(config,"TPORT",buffer);
+}
 int main(int argc, char **argv) {
     jnx_mem_print_to_file("logs/mem.file");
     jnx_log_file_setup("logs/current.log");
     jnx_hashmap *configuration = jnx_file_read_kvp(CONFIG_PATH, 1024, "=");
+
 
     assert(configuration);
 
     print_config(configuration);
 
     resolve_interface_address(configuration);
+	
+	generate_port(configuration);
 
     generate_guid(configuration);
 

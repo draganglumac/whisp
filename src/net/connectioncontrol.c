@@ -41,8 +41,9 @@ static RSA *mysessionkeypair;
 static char *mysessionpublickeystr;
 //Not really thread safe
 
-void session_listener_callback(char *msg, size_t len , char *ip) {
+int session_listener_callback(char *msg, size_t len , char *ip) {
 
+	return 0;
 }
 void* connectioncontrol_setup(void *args) {
     configuration =(jnx_hashmap*)args;
@@ -80,7 +81,9 @@ void* connectioncontrol_start(void *args) {
 	RSA *localkeypair = generate_key(2048);
 	
 	mysessionpublickeystr = key_to_string(localkeypair,PUBLIC);
-	
+
+	printf("%s\n",mysessionpublickeystr);
+
     //-------DO WE ALREADY HAVE THEIR PUBLIC KEY   IF YES GOTO ***
     ///Send our public key to target
 

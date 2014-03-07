@@ -79,13 +79,14 @@ return 0;
 
 
 ///////// THREAD TWO ///////
-void multicast_listener(char *msg, size_t len, char *ip) {
+int multicast_listener(char *msg, size_t len, char *ip) {
     JNX_LOGF("Multicast listener got [%s]\n",msg);
     thread_data *thr = JNX_MEM_MALLOC(sizeof(thread_data));
     thr->len = len;
     thr->msg = msg;
     thr->ip = ip;
     ASYNC_START(multicast_serialization_process,thr);
+	return 0;
 }
 void *multicast_listen_start(void *args) {
     thread_data *data = (thread_data*)args;
