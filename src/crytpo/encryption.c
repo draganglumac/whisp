@@ -41,7 +41,6 @@ char *key_to_string(RSA *keypair,key_type type) {
 RSA *string_to_key(char *string, key_type type) {
     BIO *key = BIO_new_mem_buf((void*)string,strlen(string));
     RSA *rsa;
-
     switch(type) {
     case PUBLIC:
         PEM_read_bio_RSAPublicKey(key,&rsa,0,NULL);
