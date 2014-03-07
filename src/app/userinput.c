@@ -77,12 +77,10 @@ void user_input_loop() {
                 printf("======================================\n");
                 //We offload from this thread so we can monitor progress
                 ASYNC_START(connectioncontrol_start,found_peer);
-                while(connectioncontrol_isconnected() == 0) {
-					sleep(.5);
-				}
-            	printf("======================================\n");
-			
+            	system("clear");
+				printf("======================================\n");
 				printf("Connected!\n");
+            	printf("======================================\n");
             }
             free(cl);
         }
