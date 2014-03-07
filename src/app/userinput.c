@@ -39,6 +39,15 @@ void user_input_loop() {
         if(getline(&line,&n,stdin) == -1) {
         }
         trim(line);
+
+		if(connectioncontrol_isconnected()) {
+
+			///send everything down the pipe
+			if(connectioncontrol_secure_message(line) != 0){
+				printf("secure_message error\n");
+			}
+		}
+
         if(strcmp(line,"list") == 0) {
             printf("Fetching list...\n");
             printf("%s\n",peerstore_get_peerstring());
@@ -68,12 +77,12 @@ void user_input_loop() {
                 printf("======================================\n");
                 //We offload from this thread so we can monitor progress
                 ASYNC_START(connectioncontrol_start,found_peer);
-
-                jnx_term_load_spinner(1);
                 while(connectioncontrol_isconnected() == 0) {
-                }
-                jnx_term_load_spinner(0);
-                printf("Connected!\n");
+					sleep(.5);
+				}
+            	printf("======================================\n");
+			
+				printf("Connected!\n");
             }
             free(cl);
         }

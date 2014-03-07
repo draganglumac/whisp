@@ -21,4 +21,5 @@
 void* connectioncontrol_setup(void *args); 
 void* connectioncontrol_start(void *args);
 int  connectioncontrol_isconnected(void);
+int connectioncontrol_secure_message(char *msg);
 #endif
