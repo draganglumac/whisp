@@ -29,6 +29,14 @@
 #include "userinput.h"
 #include "discovery.h"
 #include "connectioncontrol.h"
+void print_welcome() {
+	system("clear");	
+	printf("==================================\n");
+	printf("=         Whisp(pre alpha)       =\n");
+	printf("=                                =\n");
+	printf("=     P2P decentralised comms    =\n");
+	printf("==================================\n");
+}
 void print_config(jnx_hashmap *config) {
     const char **keys;
     int num = jnx_hash_get_keys(config, &keys);
@@ -82,27 +90,33 @@ int random_in_range(unsigned int min, unsigned int max) {
 		return random_in_range(min,max);
 	}
 }
-void generate_port(jnx_hashmap *config) {
+void generate_ports(jnx_hashmap *config) {
 
 	int r = random_in_range(49152,65535);
 	char *buffer = JNX_MEM_MALLOC(56);
 	sprintf(buffer,"%d",r);
-	printf("Adding port %s to map\n",buffer);
+	printf("Adding tcp port %s to map\n",buffer);
 	jnx_hash_put(config,"TPORT",buffer);
+
+	r = random_in_range(41390,51952);
+	char *buffertwo = JNX_MEM_MALLOC(56);
+	sprintf(buffertwo,"%d",r);
+	printf("Adding secure socket port %s to map\n",buffertwo);
+	jnx_hash_put(config,"SECUREPORT",buffertwo);
 }
 int main(int argc, char **argv) {
     jnx_mem_print_to_file("logs/mem.file");
     jnx_log_file_setup("logs/current.log");
     jnx_hashmap *configuration = jnx_file_read_kvp(CONFIG_PATH, 1024, "=");
 
-
     assert(configuration);
 
-    print_config(configuration);
+	print_welcome();
+//    print_config(configuration);
 
     resolve_interface_address(configuration);
 	
-	generate_port(configuration);
+	generate_ports(configuration);
 
     generate_guid(configuration);
 
@@ -110,7 +124,6 @@ int main(int argc, char **argv) {
 
     serialiser_setup(configuration);
 
-    //Initial setup done
     jnx_thread_create_disposable(discovery_start,NULL);
 	
 	jnx_thread_create_disposable(connectioncontrol_setup,configuration);

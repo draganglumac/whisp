@@ -67,7 +67,8 @@ void user_input_loop() {
                 printf("GUID -> %s\n",found_peer->guid);
                 printf("COMMAND -> %s\n",found_peer->command);
                 printf("IP -> %s\n",found_peer->ip);
-                printf("TPORT -> %s\n",found_peer->port);
+				printf("TPORT -> %s\n",found_peer->port);
+                printf("SECUREPORT -> %s\n",found_peer->secure_port);
                 printf("PEERAGE -> %s\n",found_peer->peerstring);
                 if(found_peer->has_public_key) {
                     printf("Has stored public key!\n");

@@ -101,7 +101,7 @@ void *multicast_pulse(void *args) {
     thread_data *data = (thread_data*)args;
     char *buffer;
     size_t len = serialize_data(&buffer,jnx_hash_get(configuration,"GUID"),"PULSE",
-			jnx_hash_get(configuration,"TPORT"),"PEER-NULL");
+			jnx_hash_get(configuration,"TPORT"),jnx_hash_get(configuration,"SECUREPORT"),"PEER-NULL");
     jnx_socket_udp_send(data->s,data->bgroup,data->port,buffer,len);
     JNX_MEM_FREE(buffer);
     return 0;

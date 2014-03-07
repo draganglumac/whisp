@@ -27,6 +27,7 @@ static char* guid_string = NULL;
 #define GUID_KEY "GUID"
 #define COMMAND_KEY "COMMAND"
 #define PORT_KEY "TPORT"
+#define SECUREPORT_KEY "SECUREPORT"
 #define PEERAGE_KEY "PEERAGE"
 #define DELIMITER ":"
 void serialiser_setup(jnx_hashmap *configuration) {
@@ -35,12 +36,12 @@ void serialiser_setup(jnx_hashmap *configuration) {
         assert(guid_string);
     }
 }
-size_t serialize_data(char **outbuffer,char *guid,char *command,char *port, char *peerage) {
+size_t serialize_data(char **outbuffer,char *guid,char *command,char *port, char *secure_port,char *peerage) {
     size_t s = 0;
     char buffer[1024];
     bzero(buffer,1024);
-    const char *data_frame = "GUID:%s:COMMAND:%s:TPORT:%s:PEERAGE:%s:";
-    sprintf(buffer,data_frame,guid,command,port,peerage);
+    const char *data_frame = "GUID:%s:COMMAND:%s:TPORT:%s:SECUREPORT:%s:PEERAGE:%s:";
+    sprintf(buffer,data_frame,guid,command,port,secure_port,peerage);
     s = strlen(buffer);
     *outbuffer = JNX_MEM_CALLOC(s,sizeof(char));
     memcpy(*outbuffer,buffer,s);
@@ -93,7 +94,19 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
 			(*outpeer)->port = strdup(value);
 
 		}
-        if(strcmp(t,PEERAGE_KEY) == 0) {
+		if(strcmp(t,SECUREPORT_KEY) == 0) {
+			char *value = strtok_r(NULL,DELIMITER,&saveptr);
+			if(value == NULL) {
+                JNX_MEM_FREE((*outpeer)->guid);
+                JNX_MEM_FREE((*outpeer)->command);
+                JNX_MEM_FREE((*outpeer)->port);
+                JNX_MEM_FREE(*outpeer);
+                *outpeer = NULL;
+				return S_MALFORMED;
+			}
+			(*outpeer)->secure_port = strdup(value);
+		}
+		if(strcmp(t,PEERAGE_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
                 JNX_MEM_FREE((*outpeer)->guid);
