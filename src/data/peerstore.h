@@ -22,23 +22,20 @@
 #include <openssl/pem.h>
 typedef struct raw_peer
 {
+	int has_public_key;
+	char *publickey;
 	char *guid;
 	char *command;
 	char *ip;
 	char *peerstring;
 } raw_peer;
 
-int peerstore_check_peer(char *guid);
+int peerstore_check_peer(char *guid,raw_peer **inpeer);
 
 char* peerstore_get_peerstring();
 
-int peerstore_get_value(char *guid, char **public_key_str);
-
 int peerstore_add_peer(raw_peer *rp);
 
-int peerstore_remove_peer(char *guid);
-
-int peerstore_update_peer(char *guid);
 
 
 #endif

@@ -23,6 +23,7 @@
 #include "connectioncontrol.h"
 #include <jnxc_headers/jnxmem.h>
 #include <jnxc_headers/jnxterm.h>
+#include <jnxc_headers/jnxlog.h>
 static int isConnecting = 0;
 void trim(char *line) {
     size_t ln = strlen(line) -1;
@@ -49,23 +50,23 @@ void user_input_loop() {
             getline(&l,&n,stdin);
             trim(l);
             char *cl = strdup(l);
-            if(peerstore_check_peer(cl)) {
-                printf("Connecting to %s\n",cl);
-                char *public_key_str;
-                char *cldup = strdup(cl);
-                int ret = peerstore_get_value(cldup,&public_key_str);
-                int has_hand_shaken = 0;
-                if(ret != 0) {
-                    printf("No previous handshake data...\n");
-                } else {
-                    has_hand_shaken = 1;
-                }
-                thread_data *thr = JNX_MEM_MALLOC(sizeof(thread_data));
-                thr->previous_hand_shake = has_hand_shaken;
-                thr->public_key_str = public_key_str;
 
-                ASYNC_START(connectioncontrol_start,thr);
-                free(cldup);
+            raw_peer *found_peer;
+            if(peerstore_check_peer(cl,&found_peer)) {
+
+                printf("==========FOUND STORED PEER===========\n");
+                printf("GUID -> %s\n",found_peer->guid);
+                printf("COMMAND -> %s\n",found_peer->command);
+                printf("IP -> %s\n",found_peer->ip);
+                printf("PEERAGE -> %s\n",found_peer->peerstring);
+                if(found_peer->has_public_key) {
+                    printf("Has stored public key!\n");
+                } else {
+                    printf("No previous public key stored\n");
+                }
+                printf("======================================\n");
+				//We offload from this thread so we can monitor progress
+                ASYNC_START(connectioncontrol_start,found_peer);
                 if(connectioncontrol_isconnected() == 0) {
                     jnx_term_load_spinner(1);
                     while(connectioncontrol_isconnected() == 0) {
@@ -76,13 +77,15 @@ void user_input_loop() {
 
                     while(connectioncontrol_isconnected()) {
 
-
                     }
                 }
             }
+            free(cl);
         }
     }
 }
+
+
 
 
 

@@ -16,6 +16,7 @@
  * =====================================================================================
  */
 #include <jnxc_headers/jnxmem.h>
+#include <jnxc_headers/jnxlog.h>
 #include <jnxc_headers/jnxthread.h>
 #include <stdlib.h>
 #include "serialization.h"
@@ -58,8 +59,6 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
     }
     *outpeer = JNX_MEM_MALLOC(sizeof(raw_peer));
     while(t != NULL) {
-//        printf("token --> %s\n",t);
-
         if(strcmp(t,GUID_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
@@ -67,9 +66,8 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
                 *outpeer = NULL;
                 return S_MALFORMED;
             }
-            (*outpeer)->guid = JNX_MEM_CALLOC(strlen(value),sizeof(char));
-            memcpy((*outpeer)->guid,value,strlen(value));
-//            printf("GUID KEY %s with value %s\n",t,(*outpeer)->guid);
+            (*outpeer)->guid = strdup(value);
+            //        JNX_LOGC("GUID KEY %s with value %s\n",t,(*outpeer)->guid);
         }
         if(strcmp(t, COMMAND_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
@@ -79,9 +77,8 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
                 *outpeer = NULL;
                 return S_MALFORMED;
             }
-            (*outpeer)->command = JNX_MEM_CALLOC(strlen(value),sizeof(char));
-            memcpy((*outpeer)->command,value,strlen(value));
-//            printf("COMMAND KEY %s with value %s\n",t,(*outpeer)->command);
+            (*outpeer)->command = strdup(value);
+            //          JNX_LOGC("COMMAND KEY %s with value %s\n",t,(*outpeer)->command);
         }
         if(strcmp(t,PEERAGE_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
@@ -92,15 +89,19 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
                 *outpeer = NULL;
                 return S_MALFORMED;
             }
-            (*outpeer)->peerstring = JNX_MEM_CALLOC(strlen(value),sizeof(char));
-            memcpy((*outpeer)->peerstring,value,strlen(value));
-//            printf("PEER KEY %s with value %s\n",t,(*outpeer)->peerstring);
+            (*outpeer)->peerstring = strdup(value);
+//            JNX_LOGC("PEER KEY %s with value %s\n",t,(*outpeer)->peerstring);
         }
         (*outpeer)->ip = interface_ip;
+        (*outpeer)->has_public_key = 0;
+        (*outpeer)->publickey = NULL;
+
         t = strtok_r(NULL,DELIMITER,&saveptr);
     }
     return S_OKAY;
 }
+
+
 
 
 

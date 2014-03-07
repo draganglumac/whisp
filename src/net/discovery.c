@@ -36,14 +36,13 @@ jnx_socket *multicast_pulse_in;
 static jnx_thread_mutex clock_lock;
 static thread_data *multicast_listen_thrdata;
 static thread_data *multicast_send_thrdata;
-
+static char *guid_string = NULL;
 
 
 ///////ASYNC THREAD////////
 void *multicast_serialization_process(void *args) {
     thread_data *p = (thread_data*)args;
     raw_peer *rp = NULL;
-    JNX_LOGF("Deserializing [%s %d %s]\n",p->msg,p->len,p->ip);
     S_TYPES ret = deserialize_data(&rp,p->msg,p->len,p->ip);
     JNX_MEM_FREE(p);
     switch(ret) {
@@ -57,23 +56,24 @@ void *multicast_serialization_process(void *args) {
         JNX_LOGF("Unknown error deserializing...\n");
         break;
     case S_OKAY:
-        if(p) {
-            if(strcmp(rp->guid,jnx_hash_get(configuration,"GUID")) != 0) {
-                if(!peerstore_check_peer(rp->guid)) {
-                    peerstore_add_peer(rp);
-                } else {
-                    JNX_LOGF("Existing peer found %s\n",rp->guid);
-                }
+        assert(rp);
+        assert(rp->guid);
+        assert(rp->command);
+        assert(rp->ip);
+        if(strcmp(rp->guid,guid_string) != 0) {
+			raw_peer *handle;
+            if(!peerstore_check_peer(rp->guid,&handle)) {
+                peerstore_add_peer(rp);
             } else {
-                JNX_LOGF("Ignoring my guid...\n");
+                JNX_LOGF("Existing peer found %s\n",rp->guid);
+				JNX_MEM_FREE(rp);
             }
-            JNX_MEM_FREE(rp);
         } else {
-            JNX_LOGF("Error raw_peer data is null\n");
+            JNX_LOGF("Ignoring my guid...\n");
+			JNX_MEM_FREE(rp);
         }
-        break;
     }
-    return 0;
+return 0;
 }
 ///////////////////////////
 
@@ -96,8 +96,7 @@ void *multicast_listen_start(void *args) {
 
 ///////ASYNC THREAD////////
 void *multicast_pulse(void *args) {
-	printf("[Multicast pulse]\n");
-	thread_data *data = (thread_data*)args;
+    thread_data *data = (thread_data*)args;
     char *buffer;
     size_t len = serialize_data(&buffer,jnx_hash_get(configuration,"GUID"),"PULSE","PEER-NULL");
     jnx_socket_udp_send(data->s,data->bgroup,data->port,buffer,len);
@@ -108,6 +107,8 @@ void *multicast_pulse(void *args) {
 void discovery_setup(jnx_hashmap *config) {
     configuration = config;
     assert(configuration);
+    guid_string = jnx_hash_get(configuration,"GUID");
+    assert(guid_string);
     char *af = jnx_hash_get(configuration,"ADDFAMILY");
     unsigned int family = AF_INET;
     if(strcmp(af,"AF_INET6") == 0) {
@@ -167,6 +168,9 @@ void* discovery_start(void *args) {
 void discovery_teardown() {
 
 }
+
+
+
 
 
 
