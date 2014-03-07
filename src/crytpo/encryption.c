@@ -17,7 +17,7 @@
  */
 #include <stdlib.h>
 #include "encryption.h"
-
+#include <jnxc_headers/jnxmem.h>
 RSA *generate_key(size_t len) {
     return RSA_generate_key(len,PUB_EXP,NULL,NULL);
 }
@@ -33,7 +33,7 @@ char *key_to_string(RSA *keypair,key_type type) {
         break;
     }
     size_t len = BIO_pending(key);
-    char *skey = malloc(len + 1);
+    char *skey = JNX_MEM_MALLOC(len + 1);
     BIO_read(key,skey,len);
     skey[len] = '\0';
     return skey;
@@ -50,8 +50,9 @@ RSA *string_to_key(char *string, key_type type) {
     return rsa;
 }
 char* encrypt_message(RSA *keypair, char *message, size_t *out_encrypted_len) {
-    char *encrypt = malloc(RSA_size(keypair));
-    char *err = malloc(130);
+	assert(keypair);
+    char *encrypt = JNX_MEM_MALLOC(RSA_size(keypair));
+    char *err = JNX_MEM_MALLOC(130);
     if((*out_encrypted_len = RSA_public_encrypt(strlen(message)+1,(unsigned char*)message,
                              (unsigned char*)encrypt,keypair,RSA_PKCS1_OAEP_PADDING)) == -1) {
         ERR_load_crypto_strings();
@@ -63,8 +64,8 @@ char* encrypt_message(RSA *keypair, char *message, size_t *out_encrypted_len) {
     return encrypt;
 }
 char *decrypt_message(RSA *keypair, char *encrypted_message, size_t encrypted_message_len, size_t *out_decrypted_len) {
-    char *decrypt = malloc(RSA_size(keypair));
-    char *err = malloc(130);
+    char *decrypt = JNX_MEM_MALLOC(RSA_size(keypair));
+    char *err = JNX_MEM_MALLOC(130);
     if((*out_decrypted_len = RSA_private_decrypt(encrypted_message_len,(unsigned char*)encrypted_message,(unsigned char*)
                              decrypt,keypair,RSA_PKCS1_OAEP_PADDING)) == -1) {
         ERR_load_crypto_strings();
