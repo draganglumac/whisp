@@ -1,6 +1,8 @@
 build
 chat
 logs
+tags
+
 # Object files
 *.o
 *.ko
