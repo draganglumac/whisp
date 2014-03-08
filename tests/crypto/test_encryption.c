@@ -72,6 +72,10 @@ void test_encrypt_with_string_decrypt_with_key() {
 	jnx_term_printf_in_color(JNX_COL_GREEN, "Pass\n");
 }
 
+void test_verifying_signature() {
+
+}
+
 int main() {
 	global_initialise_openSSL();
 	

@@ -38,5 +38,8 @@ char* encrypt_message(RSA *keypair, char *message, size_t *out_encrypted_len);
 
 char *decrypt_message(RSA *keypair, char *encrypted_message, size_t encrypted_message_len, size_t *out_decrypted_len);
 
+char *encrypt_message_with_signature(RSA *sender, RSA *receiver, char *message, size_t *encrypted_len);
+
+char *decrypt_signed_message(RSA *sender, RSA *receiver, char *encrypted, size_t encrypted_len, size_t *decrypted_len);
 
 #endif

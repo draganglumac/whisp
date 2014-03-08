@@ -82,3 +82,17 @@ char *decrypt_message(RSA *keypair, char *encrypted_message, size_t encrypted_me
     free(err);
     return decrypt;
 }
+char *encrypt_message_with_signature(RSA *sender, RSA *receiver, char *message, size_t *encrypted_len) {
+	assert(sender);
+	assert(receiver);
+
+	char *sig="SiGnAtUrE4wHiSp";
+}
+char *decrypt_signed_message(RSA *sender, RSA *receiver, char *encrypted, size_t encrypted_len, size_t *decrypted_len) {
+	assert(sender);
+	assert(receiver);
+
+	char *sig="SiGnAtUrE4wHiSp";
+}
+
+
