@@ -1,8 +1,5 @@
 whisp
 =====
-[![Build Status](https://travis-ci.org/AlexsJones/whisp.png)](https://travis-ci.org/AlexsJones/whisp)
-
-
 P2P decentralised chat program in early pre-Alpha
 
 
