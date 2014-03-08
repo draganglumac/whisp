@@ -32,4 +32,13 @@ void generate_guid(jnx_hashmap *config);
 
 void generate_ports(jnx_hashmap *config);
 
+// This function must be called once only per process
+// before any other OpenSSL API function is called.
+// Best done at the beginning of main.
+void global_initialise_openSSL();
+
+// This function should be called once only per process
+// when OpenSSL API functions are no longer needed.
+// Best done just before main returns.
+void global_cleanup_openSSL();
 #endif // __APP_H__

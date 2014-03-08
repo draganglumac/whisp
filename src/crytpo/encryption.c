@@ -41,6 +41,7 @@ char *key_to_string(RSA *keypair,key_type type) {
     char *skey = JNX_MEM_MALLOC(len + 1);
     size_t read = BIO_read(key,skey,len);
     skey[read + 1] = '\0';
+	BIO_free(key);
     return skey;
 }
 RSA *string_to_key(char *string, key_type type) {
@@ -51,6 +52,7 @@ RSA *string_to_key(char *string, key_type type) {
         PEM_read_bio_RSAPublicKey(key,&rsa,0,NULL);
         break;
     }
+	BIO_free(key);
     return rsa;
 }
 char* encrypt_message(RSA *keypair, char *message, size_t *out_encrypted_len) {

@@ -47,11 +47,17 @@ int main(int argc, char **argv) {
 
 	serialiser_setup(configuration);
 
+	// Calling it here before we use any of the OpenSSL API calls
+	global_initialise_openSSL();
+	
 	jnx_thread_create_disposable(discovery_start,NULL);
 
 	jnx_thread_create_disposable(connectioncontrol_setup,configuration);
 
 	user_input_loop();
+
+	// Cleaning up OpenSSL infrastructure for the process before return.
+	global_cleanup_openSSL();
 
 	return 0;
 }
