@@ -3,15 +3,15 @@
  *
  *       Filename:  encryption.c
  *
- *    Description:
+ *    Description:  
  *
  *        Version:  1.0
  *        Created:  03/06/14 16:23:08
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  jonesax (),
- *   Organization:
+ *         Author:  jonesax (), 
+ *   Organization:  
  *
  * =====================================================================================
  */
@@ -49,7 +49,7 @@ RSA *string_to_key(char *string, key_type type) {
     return rsa;
 }
 char* encrypt_message(RSA *keypair, char *message, size_t *out_encrypted_len) {
-    assert(keypair);
+	assert(keypair);
     char *encrypt = JNX_MEM_MALLOC(RSA_size(keypair));
     char *err = JNX_MEM_MALLOC(130);
     if((*out_encrypted_len = RSA_public_encrypt(strlen(message)+1,(unsigned char*)message,

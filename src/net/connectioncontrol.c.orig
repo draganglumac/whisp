@@ -109,13 +109,13 @@ int session_listener_callback(char *msg, size_t len , char *ip) {
         if(peerstore_check_peer(incoming_guid,&rp)) {
             //lets send back our public key!
             assert(rp);
-
-            ///At this point we have to populate our side of the data they will already have about us
-            theirsecureport = rp->secure_port;
-            theirip = rp->ip;
-            theirpublickey = incoming_publickey;
-
-            char *mypayload = build_payload(jnx_hash_get(configuration,"GUID"), mysessionpublickeystr, REPLY);
+    
+			///At this point we have to populate our side of the data they will already have about us
+			theirsecureport = rp->secure_port;
+			theirip = rp->ip;
+			theirpublickey = incoming_publickey;	
+	
+			char *mypayload = build_payload(jnx_hash_get(configuration,"GUID"), mysessionpublickeystr, REPLY);
             session_tcp_connector = jnx_socket_tcp_create(AF_INET);
             char *is_debug = jnx_hash_get(configuration,"DEBUG");
             assert(is_debug);
@@ -150,7 +150,7 @@ int session_listener_callback(char *msg, size_t len , char *ip) {
 }
 int secure_server_callback(char *msg, size_t len, char *ip) {
     printf("===========SECURE INCOMING TRANSMISSION============\n");
-    printf("%s\n",msg);
+	printf("%s\n",msg);
     printf("===================================================\n");
     return 0;
 }
@@ -186,7 +186,7 @@ void* connectioncontrol_start(void *args) {
     mysessionkeypair = NULL;
     theirport = NULL;
     theirip = NULL;
-    theirsecureport = NULL;
+	theirsecureport = NULL;
     connected = 0;
     raw_peer *rp = (raw_peer*)args;
 
@@ -195,7 +195,7 @@ void* connectioncontrol_start(void *args) {
         assert(theirpublickey);
         JNX_LOGC("Already have peer public key it is %s\n",theirpublickey);
     }
-    theirsecureport = rp->secure_port;
+	theirsecureport = rp->secure_port;
     theirport = rp->port;
     theirip = rp->ip;
     ///free keys if they already exist?
@@ -224,17 +224,17 @@ int connectioncontrol_secure_message(char *msg) {
         printf("Not connected\n");
         return -1;
     }
-    assert(theirpublickey);
-    assert(theirip);
-    assert(theirsecureport);
+	assert(theirpublickey);
+	assert(theirip);
+	assert(theirsecureport);
+	
+	char *encrypt = msg;
 
-    char *encrypt = msg;
-
-    printf("===========SECURE OUTGOING TRANSMISSION============\n");
-    printf("%s\n",encrypt);
+	printf("===========SECURE OUTGOING TRANSMISSION============\n");
+	printf("%s\n",encrypt);
     printf("===================================================\n");
 
-    secure_socket_connector = jnx_socket_tcp_create(AF_INET);
+	secure_socket_connector = jnx_socket_tcp_create(AF_INET);
 
     if(strcmp(jnx_hash_get(configuration,"DEBUG"),"YES") == 0) {
         jnx_socket_tcp_send(secure_socket_connector,"localhost",theirsecureport,encrypt,strlen(encrypt));
@@ -242,7 +242,7 @@ int connectioncontrol_secure_message(char *msg) {
         jnx_socket_tcp_send(secure_socket_connector,theirip,theirsecureport,encrypt,strlen(encrypt));
     }
     jnx_socket_destroy(&secure_socket_connector);
-    return 0;
+	return 0;
 }
 
 

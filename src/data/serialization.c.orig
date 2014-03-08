@@ -82,37 +82,37 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
             (*outpeer)->command = strdup(value);
             //          JNX_LOGC("COMMAND KEY %s with value %s\n",t,(*outpeer)->command);
         }
-        if(strcmp(t, PORT_KEY) == 0) {
-            char *value = strtok_r(NULL,DELIMITER,&saveptr);
-            if(value == NULL) {
+		if(strcmp(t, PORT_KEY) == 0) {
+			char *value = strtok_r(NULL,DELIMITER,&saveptr);
+			if(value == NULL) {
                 JNX_MEM_FREE((*outpeer)->guid);
                 JNX_MEM_FREE((*outpeer)->command);
                 JNX_MEM_FREE(*outpeer);
                 *outpeer = NULL;
-                return S_MALFORMED;
-            }
-            (*outpeer)->port = strdup(value);
+				return S_MALFORMED;
+			}
+			(*outpeer)->port = strdup(value);
 
-        }
-        if(strcmp(t,SECUREPORT_KEY) == 0) {
-            char *value = strtok_r(NULL,DELIMITER,&saveptr);
-            if(value == NULL) {
+		}
+		if(strcmp(t,SECUREPORT_KEY) == 0) {
+			char *value = strtok_r(NULL,DELIMITER,&saveptr);
+			if(value == NULL) {
                 JNX_MEM_FREE((*outpeer)->guid);
                 JNX_MEM_FREE((*outpeer)->command);
                 JNX_MEM_FREE((*outpeer)->port);
                 JNX_MEM_FREE(*outpeer);
                 *outpeer = NULL;
-                return S_MALFORMED;
-            }
-            (*outpeer)->secure_port = strdup(value);
-        }
-        if(strcmp(t,PEERAGE_KEY) == 0) {
+				return S_MALFORMED;
+			}
+			(*outpeer)->secure_port = strdup(value);
+		}
+		if(strcmp(t,PEERAGE_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
                 JNX_MEM_FREE((*outpeer)->guid);
                 JNX_MEM_FREE((*outpeer)->command);
-                JNX_MEM_FREE((*outpeer)->port);
-                JNX_MEM_FREE(*outpeer);
+         		JNX_MEM_FREE((*outpeer)->port);
+		 		JNX_MEM_FREE(*outpeer);
                 *outpeer = NULL;
                 return S_MALFORMED;
             }
