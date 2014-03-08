@@ -28,6 +28,8 @@ typedef enum key_type { PUBLIC, PRIVATE } key_type;
 
 RSA *generate_key(size_t len);
 
+void free_key(RSA *key);
+
 RSA *string_to_key(char *string, key_type type);
 
 char *key_to_string(RSA *keypair,key_type type);
