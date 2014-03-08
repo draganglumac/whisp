@@ -60,14 +60,10 @@ void test_encrypt_with_string_decrypt_with_key() {
 	char *plaintext = "Hello world!";
 	char *ciphertext = encrypt_message(publicrsa, plaintext, &cipherlength);
 	char *decrypted = decrypt_message(keypair, ciphertext, cipherlength, &decryptlength);
-//	char *ciphertext = encrypt_message(keypair, plaintext, &cipherlength);
-//	char *decrypted = decrypt_message(keypair, ciphertext, cipherlength, &decryptlength);
 
 	assert(strncmp(plaintext, decrypted, decryptlength) == 0);
 
 	free(public);
-	// NOTE: For some reason freeing public string results in double-free
-	// so it must be that somewhere else it gets freed. To investigate!
 	free(decrypted);
 	free(ciphertext);
 	free_key(publicrsa);
