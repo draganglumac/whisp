@@ -77,18 +77,9 @@ void generate_guid(jnx_hashmap *config) {
     jnx_hash_put(config, "GUID", strdup(buffer));
 }
 int random_in_range(unsigned int min, unsigned int max) {
-	
 	srand(time(NULL));	
 	int base_random = rand();
-	if(RAND_MAX == base_random) return random_in_range(min,max);
-	int range = max - min,
-		remainder = RAND_MAX % range,
-		bucket = RAND_MAX / range;
-	if(base_random < RAND_MAX - remainder) {
-		return min + base_random / bucket;
-	} else {
-		return random_in_range(min,max);
-	}
+	return (min + base_random % (max - min + 1));
 }
 void generate_ports(jnx_hashmap *config) {
 
