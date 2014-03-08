@@ -9,7 +9,7 @@ function setup_for() {
 }
 
 function make_and_run() {
-	make -s tests
+	make -s test
 	./runtests
 }
 
@@ -18,7 +18,7 @@ function teardown() {
 	rm runtests
 }
 
-for f in test/*/*.c
+for f in tests/*/*.c
 do
 	setup_for $f
 	make_and_run
