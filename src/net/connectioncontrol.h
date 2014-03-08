@@ -18,7 +18,8 @@
 #ifndef __CONNECTION_CONTROL_H__
 #define __CONNECTION_CONTROL_H__
 
-void* connectioncontrol_setup(void *args); 
+void* connectioncontrol_setup(void *args);
+void connectioncontrol_stop(void);
 void* connectioncontrol_start(void *args);
 int  connectioncontrol_isconnected(void);
 int connectioncontrol_secure_message(char *msg);

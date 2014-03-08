@@ -41,8 +41,10 @@ void user_input_loop() {
         trim(line);
 
         if(connectioncontrol_isconnected()) {
-
-            ///send everything down the pipe
+			if(strcmp(line,"exit") == 0) { 
+				connectioncontrol_stop();
+			}
+			///send everything down the pipe
             if(connectioncontrol_secure_message(line) != 0) {
                 printf("secure_message error\n");
             }
@@ -61,16 +63,16 @@ void user_input_loop() {
             char *cl = strdup(l);
 
             raw_peer *found_peer;
-            if(peerstore_check_peer(cl,&found_peer)) {
-
-                printf("==========FOUND STORED PEER===========\n");
-                printf("GUID -> %s\n",found_peer->guid);
-                printf("COMMAND -> %s\n",found_peer->command);
-                printf("IP -> %s\n",found_peer->ip);
-                printf("TPORT -> %s\n",found_peer->port);
-                printf("SECUREPORT -> %s\n",found_peer->secure_port);
-                printf("PEERAGE -> %s\n",found_peer->peerstring);
-                if(found_peer->has_public_key) {
+          
+		  	if(peerstore_check_peer(cl,&found_peer)) {
+				
+				assert(found_peer->guid);
+				assert(found_peer->command);
+				assert(found_peer->ip);
+				assert(found_peer->port);
+				assert(found_peer->secure_port);
+                
+				if(found_peer->has_public_key) {
                     printf("Has stored public key!\n");
                 } else {
                     printf("No previous public key stored\n");

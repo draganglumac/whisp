@@ -228,7 +228,12 @@ int connectioncontrol_secure_message(char *msg) {
     assert(theirip);
     assert(theirsecureport);
 
-    char *encrypt = msg;
+  	 
+	char *encrypt = msg;
+
+
+
+
 
     printf("===========SECURE OUTGOING TRANSMISSION============\n");
     printf("%s\n",encrypt);
@@ -244,6 +249,12 @@ int connectioncontrol_secure_message(char *msg) {
     jnx_socket_destroy(&secure_socket_connector);
     return 0;
 }
+void connectioncontrol_stop(void) {
+	
+	///Free things that need to be freed
+	//null things
 
+	connected = 0;
+}
 
 
