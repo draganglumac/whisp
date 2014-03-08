@@ -2,7 +2,7 @@ language: c
 compiler:
     - gcc
     - clang
-script: make
+script: git clone git@github.com:AlexsJones/jnxlibc.git && cd jnxlibc && ./platforms/linux/ && make && sudo make install && cd ../../../ && make
 notifications:
     email:
         recipients:
