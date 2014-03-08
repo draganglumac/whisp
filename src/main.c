@@ -28,30 +28,30 @@
 #include "connectioncontrol.h"
 
 int main(int argc, char **argv) {
-    jnx_mem_print_to_file("logs/mem.file");
-    jnx_log_file_setup("logs/current.log");
-    jnx_hashmap *configuration = jnx_file_read_kvp(CONFIG_PATH, 1024, "=");
+	jnx_mem_print_to_file("logs/mem.file");
+	jnx_log_file_setup("logs/current.log");
+	jnx_hashmap *configuration = jnx_file_read_kvp(CONFIG_PATH, 1024, "=");
 
-    assert(configuration);
+	assert(configuration);
 
 	print_welcome();
-//    print_config(configuration);
+	//    print_config(configuration);
 
-    resolve_interface_address(configuration);
-	
+	resolve_interface_address(configuration);
+
 	generate_ports(configuration);
 
-    generate_guid(configuration);
+	generate_guid(configuration);
 
-    discovery_setup(configuration);
+	discovery_setup(configuration);
 
-    serialiser_setup(configuration);
+	serialiser_setup(configuration);
 
-    jnx_thread_create_disposable(discovery_start,NULL);
-	
+	jnx_thread_create_disposable(discovery_start,NULL);
+
 	jnx_thread_create_disposable(connectioncontrol_setup,configuration);
 
-    user_input_loop();
+	user_input_loop();
 
-    return 0;
+	return 0;
 }
