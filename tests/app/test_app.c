@@ -21,4 +21,5 @@ int main() {
 	test_random_port_in_range();
 	
 	jnx_term_printf_in_color(JNX_COL_WHITE, "OK.\n");
+	return 0;
 }

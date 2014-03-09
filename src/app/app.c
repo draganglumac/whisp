@@ -93,3 +93,23 @@ void generate_ports(jnx_hashmap *config) {
     printf("Adding secure socket port %s to map\n",buffertwo);
     jnx_hash_put(config,"SECUREPORT",buffertwo);
 }
+
+// Code taken straight from OpenSSL libcrypto wiki page
+// http://wiki.openssl.org/index.php/Libcrypto_API
+void global_initialise_openSSL() {
+	// Load the human readable error strings for libcrypto
+	ERR_load_crypto_strings();
+
+	// Load all digest and cipher algorithms
+	OpenSSL_add_all_algorithms();
+
+	// Load config file, and other important initialisation
+	OPENSSL_config(NULL);
+}
+void global_cleanup_openSSL() {
+	// Removes all digests and ciphers
+	EVP_cleanup();
+
+	// Remove error strings
+	ERR_free_strings();
+}
