@@ -141,8 +141,8 @@ void* discovery_start(void *args) {
     while(1) {
         if(!start_t) {
             jnx_thread_lock(&clock_lock);
-            ASYNC_START(multicast_pulse,multicast_send_thrdata);
-            start_t = clock();
+        	multicast_pulse(multicast_send_thrdata);
+			start_t = clock();
             jnx_thread_unlock(&clock_lock);
         } else {
             jnx_thread_lock(&clock_lock);
@@ -150,7 +150,7 @@ void* discovery_start(void *args) {
             jnx_thread_unlock(&clock_lock);
             if(((end_t - start_t) / CLOCKS_PER_SEC) > interval) {
                 jnx_thread_lock(&clock_lock);
-                ASYNC_START(multicast_pulse,multicast_send_thrdata);
+        		multicast_pulse(multicast_send_thrdata);
                 start_t = clock();
                 jnx_thread_unlock(&clock_lock);
             }
