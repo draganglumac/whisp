@@ -49,13 +49,19 @@ void user_input_loop() {
                 printf("secure_message error\n");
             }
         }
-
         if(strcmp(line,"list") == 0) {
         	peerstore_print_peers();
 		}
         if(strcmp(line,"convo") == 0) {
             printf("Okay please select GUID of the peer to contact...\n");
-            char *l;
+
+	  		char *l;
+            getline(&l,&n,stdin);
+            trim(l);
+		   	
+			
+			/* 
+	  		char *l;
             size_t t;
             getline(&l,&n,stdin);
             trim(l);
@@ -85,6 +91,8 @@ void user_input_loop() {
                 printf("======================================\n");
             }
             free(cl);
+
+			*/
         }
     }
 }

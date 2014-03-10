@@ -218,6 +218,8 @@ void* connectioncontrol_start(void *args) {
     } else {
         jnx_socket_tcp_send(session_tcp_connector,rp->ip,rp->port,mypayload,strlen(mypayload));
     }
+
+	free(mypayload);
     jnx_socket_destroy(&session_tcp_connector);
     //***
     return 0;

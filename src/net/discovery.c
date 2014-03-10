@@ -25,7 +25,7 @@
 #include "serialization.h"
 #include "peerstore.h"
 
-static jnx_hashmap *configuration;
+jnx_hashmap *configuration;
 typedef int clock_interval;
 static clock_interval interval = 5;
 static clock_t start_t = NULL;
@@ -35,7 +35,6 @@ jnx_socket *multicast_pulse_in;
 static jnx_thread_mutex clock_lock;
 static thread_data *multicast_listen_thrdata;
 static thread_data *multicast_send_thrdata;
-static char *guid_string = NULL;
 
 
 ///////ASYNC THREAD////////
@@ -43,16 +42,18 @@ void *multicast_serialization_process(void *args) {
     thread_data *p = (thread_data*)args;
     raw_peer *rp = NULL;
     S_TYPES ret = deserialize_data(&rp,p->msg,p->len,p->ip);
-    JNX_MEM_FREE(p);
+   	printf("Deserialized [GUID:%s]\n",rp->guid); 
+	printf("Peerstore size is %d\n",peerstore_get_count());
+	JNX_MEM_FREE(p);
     switch(ret) {
     case S_MALFORMED:
-        JNX_LOGF("Malformed deserialization data...\n");
+        JNX_LOGC("Malformed deserialization data...\n");
         break;
     case S_GENERAL_ERROR:
-        JNX_LOGF("General error deserializing...\n");
+        JNX_LOGC("General error deserializing...\n");
         break;
     case S_UNKNOWN:
-        JNX_LOGF("Unknown error deserializing...\n");
+        JNX_LOGC("Unknown error deserializing...\n");
         break;
     case S_OKAY:
         assert(rp);
@@ -60,16 +61,12 @@ void *multicast_serialization_process(void *args) {
         assert(rp->command);
         assert(rp->ip);
         assert(rp->port);
-        if(strcmp(rp->guid,guid_string) != 0) {
-            raw_peer *handle;
-            if(!peerstore_check_peer(rp->guid,&handle)) {
-                peerstore_add_peer(rp);
-            } else {
-                JNX_LOGF("Existing peer found %s\n",rp->guid);
-                JNX_MEM_FREE(rp);
-            }
+        raw_peer *handle;
+
+        if(peerstore_check_peer(rp->guid,&handle) == 0) {
+			printf("Adding peer...\n");
+            peerstore_add_peer(rp);
         } else {
-            JNX_LOGF("Ignoring my guid...\n");
             JNX_MEM_FREE(rp);
         }
     }
@@ -77,10 +74,8 @@ void *multicast_serialization_process(void *args) {
 }
 ///////////////////////////
 
-
 ///////// THREAD TWO ///////
 int multicast_listener(char *msg, size_t len, char *ip) {
-    JNX_LOGF("Multicast listener got [%s]\n",msg);
     thread_data *thr = JNX_MEM_MALLOC(sizeof(thread_data));
     thr->len = len;
     thr->msg = msg;
@@ -109,8 +104,7 @@ void *multicast_pulse(void *args) {
 void discovery_setup(jnx_hashmap *config) {
     configuration = config;
     assert(configuration);
-    guid_string = jnx_hash_get(configuration,"GUID");
-    assert(guid_string);
+
     char *af = jnx_hash_get(configuration,"ADDFAMILY");
     unsigned int family = AF_INET;
     if(strcmp(af,"AF_INET6") == 0) {
@@ -127,6 +121,7 @@ void discovery_setup(jnx_hashmap *config) {
     int cinterval = atoi(jnx_hash_get(configuration,"INTERVAL"));
     assert(cinterval);
     interval = cinterval;
+
     multicast_pulse_out = jnx_socket_udp_create(family);
     printf("Enabling multicast sender...\n");
     //Note: loopback has been ENABLED

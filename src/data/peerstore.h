@@ -32,6 +32,8 @@ typedef struct raw_peer
 	char *peerstring;
 } raw_peer;
 
+size_t peerstore_get_count();
+
 int peerstore_check_peer(char *guid,raw_peer **inpeer);
 
 void peerstore_print_peers();

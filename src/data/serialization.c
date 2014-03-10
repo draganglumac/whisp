@@ -69,7 +69,7 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
                 return S_MALFORMED;
             }
             (*outpeer)->guid = strdup(value);
-            //        JNX_LOGC("GUID KEY %s with value %s\n",t,(*outpeer)->guid);
+            //     JNX_LOGC("GUID KEY %s with value %s\n",t,(*outpeer)->guid);
         }
         if(strcmp(t, COMMAND_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
@@ -80,7 +80,7 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
                 return S_MALFORMED;
             }
             (*outpeer)->command = strdup(value);
-            //          JNX_LOGC("COMMAND KEY %s with value %s\n",t,(*outpeer)->command);
+            //        JNX_LOGC("COMMAND KEY %s with value %s\n",t,(*outpeer)->command);
         }
         if(strcmp(t, PORT_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
@@ -92,7 +92,7 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
                 return S_MALFORMED;
             }
             (*outpeer)->port = strdup(value);
-
+            //          JNX_LOGC("PORT KEY %s with value %s\n",t,(*outpeer)->port);
         }
         if(strcmp(t,SECUREPORT_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
@@ -105,6 +105,7 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
                 return S_MALFORMED;
             }
             (*outpeer)->secure_port = strdup(value);
+//            JNX_LOGC("SECUREPORT KEY %s with value %s\n",t,(*outpeer)->secure_port);
         }
         if(strcmp(t,PEERAGE_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
@@ -127,14 +128,3 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
     }
     return S_OKAY;
 }
-
-
-
-
-
-
-
-
-
-
-
