@@ -25,7 +25,6 @@
 #include "app.h"
 #include "userinput.h"
 #include "discovery.h"
-#include "connectioncontrol.h"
 
 int main(int argc, char **argv) {
 	jnx_mem_print_to_file("logs/mem.file");
@@ -51,8 +50,6 @@ int main(int argc, char **argv) {
 	global_initialise_openSSL();
 	
 	jnx_thread_create_disposable(discovery_start,NULL);
-
-	jnx_thread_create_disposable(connectioncontrol_setup,configuration);
 
 	user_input_loop();
 

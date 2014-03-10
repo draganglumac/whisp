@@ -19,10 +19,9 @@
 #define __SESSIONCONTROL_H__
 #include "peerstore.h"
 typedef enum state {
-	PRE_HANSHAKE,
+	PRE_HANDSHAKE,
 	HANDSHAKE,
-	ENCRYPTING,
-	DECRYPTING,
+	CONNECTED
 }state;
 typedef struct session {
 	raw_peer *local_peer;
