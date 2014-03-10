@@ -22,8 +22,6 @@
 #include <openssl/pem.h>
 typedef struct raw_peer
 {
-	int has_public_key;
-	char *publickey;
 	char *guid;
 	char *command;
 	char *ip;

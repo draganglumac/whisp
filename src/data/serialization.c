@@ -121,8 +121,6 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
 //            JNX_LOGC("PEER KEY %s with value %s\n",t,(*outpeer)->peerstring);
         }
         (*outpeer)->ip = interface_ip;
-        (*outpeer)->has_public_key = 0;
-        (*outpeer)->publickey = NULL;
 
         t = strtok_r(NULL,DELIMITER,&saveptr);
     }

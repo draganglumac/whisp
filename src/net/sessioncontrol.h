@@ -19,18 +19,29 @@
 #define __SESSIONCONTROL_H__
 #include "peerstore.h"
 typedef enum state {
-	PRE_HANDSHAKE,
-	HANDSHAKE,
-	CONNECTED
+	SESSION_PRE_HANDSHAKE,
+	SESSION_HANDSHAKE,
+	SESSION_CONNECTED,
+	SESSION_ERROR
 }state;
 typedef struct session {
 	raw_peer *local_peer;
 	raw_peer *foriegn_peer;
+	//RSA keys
+	RSA *local_keypair;
+	RSA *foriegn_keypair;	
+	char *shared_secret;
 	state current_state;
 	char *session_id;
 }session;
 
-int session_check(char *session_id);
-session* session_create(raw_peer *local, raw_peer *foriegn);
+state session_get_state(char *session_id);
 
+char* session_create(raw_peer *local, raw_peer *foriegn);
+
+session* session_get_session(char *session_id);
+
+void session_destroy(session *s);
+
+int session_check_exists(raw_peer *local, raw_peer *foriegn);
 #endif

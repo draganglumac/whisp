@@ -20,14 +20,36 @@
 #include <string.h>
 #include "discovery.h"
 #include "peerstore.h"
+#include "sessioncontrol.h"
 #include <jnxc_headers/jnxmem.h>
 #include <jnxc_headers/jnxterm.h>
 #include <jnxc_headers/jnxlog.h>
+extern jnx_hashmap *configuration;
 static int isConnecting = 0;
 void trim(char *line) {
     size_t ln = strlen(line) -1;
     if(line[ln] == '\n' || line[ln] == '\r') {
         line[ln] = '\0';
+    }
+}
+void user_start_session(char *foriegn_peer_guid) {
+
+    raw_peer *local_peer;
+    if(peerstore_check_peer(jnx_hash_get(configuration,"GUID"),&local_peer)) {
+        raw_peer *foriegn_peer;
+        if(peerstore_check_peer(foriegn_peer_guid,&foriegn_peer)) {
+
+            if(!session_check_exists(local_peer,foriegn_peer)) {
+                printf("Creating new session\n");
+                char *session_handle  = session_create(local_peer,foriegn_peer);
+                session *s = session_get_session(session_handle);
+                assert(s->local_peer == local_peer);
+                assert(s->foriegn_peer == foriegn_peer);
+
+            } else {
+                printf("An existing session was found!\n");
+            }
+        }
     }
 }
 void user_input_loop() {
@@ -50,6 +72,7 @@ void user_input_loop() {
             getline(&l,&n,stdin);
             trim(l);
 
+            user_start_session(strdup(l));
         }
     }
 }
