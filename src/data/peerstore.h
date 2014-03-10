@@ -34,7 +34,7 @@ typedef struct raw_peer
 
 int peerstore_check_peer(char *guid,raw_peer **inpeer);
 
-char* peerstore_get_peerstring();
+void peerstore_print_peers();
 
 int peerstore_add_peer(raw_peer *rp);
 

@@ -51,9 +51,8 @@ void user_input_loop() {
         }
 
         if(strcmp(line,"list") == 0) {
-            printf("Fetching list...\n");
-            printf("%s\n",peerstore_get_peerstring());
-        }
+        	peerstore_print_peers();
+		}
         if(strcmp(line,"convo") == 0) {
             printf("Okay please select GUID of the peer to contact...\n");
             char *l;

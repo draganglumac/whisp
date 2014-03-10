@@ -18,58 +18,74 @@
 #include <stdlib.h>
 #include "peerstore.h"
 #include <jnxc_headers/jnxlist.h>
+#include <jnxc_headers/jnxthread.h>
 #include <unistd.h>
 #include <string.h>
-
-static jnx_list *store = NULL;
+static jnx_thread_mutex store_lock;
+static jnx_btree *store = NULL;
 
 int peerstore_check_peer(char *guid,raw_peer **inpeer) {
     if(!store) {
         return 0;
     }
-
-    jnx_node *localhead = store->head;
-    jnx_node *rewind = store->head;
     int found = 0;
-    while(localhead) {
-        raw_peer *rp = localhead->_data;
-        if(strcmp(rp->guid,guid) == 0) {
-            found = 1;
-            *inpeer = rp;
-            break;
-        }
-        localhead = localhead->next_node;
-    }
-    store->head = rewind;
-    return found;
+	jnx_list *keys = jnx_list_create();
+	jnx_thread_lock(&store_lock);
+	jnx_btree_keys(store,keys);	
+	while(keys->head) {
+		
+		raw_peer *rp= jnx_btree_lookup(store,keys->head->_data);
+		if(rp) {
+			found = 1;
+			jnx_list_destroy(&keys);
+			*inpeer = rp;
+			jnx_thread_unlock(&store_lock);
+			return found;
+		}
+		keys->head = keys->head->next_node;
+	}	
+	jnx_list_destroy(&keys);
+	*inpeer = NULL;
+	jnx_thread_unlock(&store_lock);
+	return found;
 }
-char* peerstore_get_peerstring() {
+void peerstore_print_peers() {
     if(!store) {
-        return "NULL";
+        return;
     }
+    
+	jnx_list *keys = jnx_list_create();
+	jnx_thread_lock(&store_lock);
+	jnx_btree_keys(store,keys);	
+	int count = 0;
+	while(keys->head) {
+		
+		raw_peer *rp= jnx_btree_lookup(store,keys->head->_data);
+		if(rp) {
+			printf("%d)%s\n",count,rp->guid);
+		}
+		++count;
+		keys->head = keys->head->next_node;
+	}	
+	jnx_list_destroy(&keys);
+	jnx_thread_unlock(&store_lock);
+}
+int peer_tree_compare(void *A, void *B) {
+	if(A > B) { 
+		return -1;
+	}
+	if(B > A) {
+		return 1;
+	}
 
-    jnx_node *localhead = store->head;
-    jnx_node *rewind = store->head;
-    char buffer[2048];
-    bzero(buffer,2048);
-    strcpy(buffer,"");
-    while(localhead) {
-
-        raw_peer *rp = localhead->_data;
-        strcat(buffer,rp->guid);
-        if(localhead->next_node) {
-            strcat(buffer,",");
-        }
-        localhead = localhead->next_node;
-    }
-    store->head = rewind;
-    return strdup(buffer);
+	return 0;
 }
 int peerstore_add_peer(raw_peer *rp) {
     if(!store) {
-        store = jnx_list_create();
+        store = jnx_btree_create(sizeof(int),peer_tree_compare);
     }
-    jnx_list_add(store,rp);
-    return 0;
+	jnx_thread_lock(&store_lock);
+   	jnx_btree_add(store,rp->guid,rp);
+	jnx_thread_unlock(&store_lock);
+	return 0;
 }
-
