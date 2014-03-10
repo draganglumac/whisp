@@ -25,7 +25,6 @@
 #include "serialization.h"
 #include "peerstore.h"
 
-jnx_thread_mutex discovery_lock;
 static jnx_hashmap *configuration;
 typedef int clock_interval;
 static clock_interval interval = 5;
@@ -169,22 +168,8 @@ void* discovery_start(void *args) {
     return 0;
 }
 void discovery_teardown() {
-
+    jnx_socket_destroy(&multicast_pulse_out);
+    jnx_socket_destroy(&multicast_pulse_in);
+    JNX_MEM_FREE(multicast_send_thrdata);
+    JNX_MEM_FREE(multicast_listen_thrdata);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

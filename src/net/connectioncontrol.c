@@ -146,7 +146,7 @@ int secure_server_callback(char *msg, size_t len, char *ip) {
     }
 
     printf("===========SECURE INCOMING TRANSMISSION============\n");
-    printf("RAW:%s\n",msg);
+    printf("RAW:%s[%db]\n",msg,strlen(msg));
     printf("DECRYPTED:%s -- [length:%zu]\n",decrypt,olen);
     printf("===================================================\n");
     return 0;
@@ -237,7 +237,7 @@ int connectioncontrol_secure_message(char *msg) {
 
     printf("===========SECURE OUTGOING TRANSMISSION============\n");
     printf("RAW:%s\n",msg);
-    printf("ENCRYPTED:%s\n",encrypt);
+    printf("ENCRYPTED[%db]:%s\n",olen,encrypt);
     printf("===================================================\n");
 
     secure_socket_connector = jnx_socket_tcp_create(AF_INET);

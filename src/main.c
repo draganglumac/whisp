@@ -59,5 +59,7 @@ int main(int argc, char **argv) {
 	// Cleaning up OpenSSL infrastructure for the process before return.
 	global_cleanup_openSSL();
 
+	jnx_hash_destroy(configuration);
+
 	return 0;
 }
