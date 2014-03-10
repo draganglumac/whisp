@@ -56,8 +56,8 @@ char *build_payload(char *myguid, char *mypublickey, session_command s) {
     } else if (s == REPLY) {
         session_command_s = "REPLY";
     }
-    char buffer[2048];
-    bzero(buffer,2048);
+    char buffer[1024];
+    bzero(buffer,1024);
     sprintf(buffer,"%s%s%s%s%s",session_command_s,DELIMITER,myguid,DELIMITER,mypublickey);
 
     return strdup(buffer);
@@ -90,7 +90,7 @@ int session_listener_callback(char *msg, size_t len , char *ip) {
 
     if(strcmp(incoming_command,"START") == 0) {
         ///you are being sent a start handshake request. Lets acknowledge this
-        mysessionkeypair = generate_key(2048);
+        mysessionkeypair = generate_key(1024);
         mysessionpublickeystr = key_to_string(mysessionkeypair,PUBLIC);
         //send this key back to our target by getting his raw_peer information
         raw_peer *rp;
@@ -138,7 +138,9 @@ int session_listener_callback(char *msg, size_t len , char *ip) {
 }
 int secure_server_callback(char *msg, size_t len, char *ip) {
 
-    assert(mysessionkeypair != NULL);
+
+	printf("INCOMING LENGTH %d\n",len);
+	assert(mysessionkeypair != NULL);
     size_t olen;
     char *decrypt = decrypt_message(mysessionkeypair,msg,strlen(msg),&olen);
     if(!decrypt) {
@@ -149,7 +151,11 @@ int secure_server_callback(char *msg, size_t len, char *ip) {
     printf("RAW:%s[%db]\n",msg,strlen(msg));
     printf("DECRYPTED:%s -- [length:%zu]\n",decrypt,olen);
     printf("===================================================\n");
-    return 0;
+    
+	if(decrypt) {
+		JNX_MEM_FREE(decrypt);
+	}
+	return 0;
 }
 void* secure_server_start(void*args) {
     printf("Starting secure server...\n");
@@ -196,7 +202,7 @@ void* connectioncontrol_start(void *args) {
     theirport = rp->port;
     theirip = rp->ip;
     ///free keys if they already exist?
-    mysessionkeypair = generate_key(2048);
+    mysessionkeypair = generate_key(1024);
     mysessionpublickeystr = key_to_string(mysessionkeypair,PUBLIC);
     printf("=============LOCAL SESSION PUBLIC KEY==============\n");
     printf("%s\n",mysessionpublickeystr);
@@ -248,7 +254,13 @@ int connectioncontrol_secure_message(char *msg) {
         jnx_socket_tcp_send(secure_socket_connector,theirip,theirsecureport,encrypt,strlen(encrypt));
     }
     jnx_socket_destroy(&secure_socket_connector);
-    return 0;
+
+	///Free message
+	if(olen > 0) {
+	JNX_MEM_FREE(encrypt);
+	}
+
+	return 0;
 }
 void connectioncontrol_stop(void) {
 
