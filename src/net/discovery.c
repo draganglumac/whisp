@@ -42,8 +42,6 @@ void *multicast_serialization_process(void *args) {
     thread_data *p = (thread_data*)args;
     raw_peer *rp = NULL;
     S_TYPES ret = deserialize_data(&rp,p->msg,p->len,p->ip);
-   	printf("Deserialized [GUID:%s]\n",rp->guid); 
-	printf("Peerstore size is %d\n",peerstore_get_count());
 	JNX_MEM_FREE(p);
     switch(ret) {
     case S_MALFORMED:
@@ -62,9 +60,7 @@ void *multicast_serialization_process(void *args) {
         assert(rp->ip);
         assert(rp->port);
         raw_peer *handle;
-
         if(peerstore_check_peer(rp->guid,&handle) == 0) {
-			printf("Adding peer...\n");
             peerstore_add_peer(rp);
         } else {
             JNX_MEM_FREE(rp);

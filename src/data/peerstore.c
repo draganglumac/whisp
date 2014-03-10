@@ -71,7 +71,6 @@ void peerstore_print_peers() {
     if(!store) {
         return;
     }
-
     jnx_list *keys = jnx_list_create();
     jnx_thread_lock(&store_lock);
     jnx_btree_keys(store,keys);
@@ -95,7 +94,6 @@ int peer_tree_compare(void *A, void *B) {
     if(B > A) {
         return 1;
     }
-
     return 0;
 }
 int peerstore_add_peer(raw_peer *rp) {
