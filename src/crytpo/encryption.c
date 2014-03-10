@@ -19,12 +19,12 @@
 #include "encryption.h"
 #include <jnxc_headers/jnxmem.h>
 RSA *generate_key(size_t len) {
-	srand(time(0));
+    srand(time(0));
     return RSA_generate_key(len,PUB_EXP,NULL,NULL);
 }
 void free_key(RSA *key) {
-	if (key != NULL)
-		RSA_free(key);
+    if (key != NULL)
+        RSA_free(key);
 }
 char *key_to_string(RSA *keypair,key_type type) {
     BIO *key = BIO_new(BIO_s_mem());
@@ -41,7 +41,7 @@ char *key_to_string(RSA *keypair,key_type type) {
     char *skey = JNX_MEM_MALLOC(len + 1);
     size_t read = BIO_read(key,skey,len);
     skey[read + 1] = '\0';
-	BIO_free(key);
+    BIO_free(key);
     return skey;
 }
 RSA *string_to_key(char *string, key_type type) {
@@ -52,7 +52,7 @@ RSA *string_to_key(char *string, key_type type) {
         PEM_read_bio_RSAPublicKey(key,&rsa,0,NULL);
         break;
     }
-	BIO_free(key);
+    BIO_free(key);
     return rsa;
 }
 char* encrypt_message(RSA *keypair, char *message, size_t *out_encrypted_len) {
@@ -64,9 +64,10 @@ char* encrypt_message(RSA *keypair, char *message, size_t *out_encrypted_len) {
         ERR_load_crypto_strings();
         ERR_error_string(ERR_get_error(),err);
         printf("%s\n",err);
-        free(err);
+        JNX_MEM_FREE(err);
+		return NULL;
     }
-    free(err);
+    JNX_MEM_FREE(err);
     return encrypt;
 }
 char *decrypt_message(RSA *keypair, char *encrypted_message, size_t encrypted_message_len, size_t *out_decrypted_len) {
@@ -77,22 +78,21 @@ char *decrypt_message(RSA *keypair, char *encrypted_message, size_t encrypted_me
         ERR_load_crypto_strings();
         ERR_error_string(ERR_get_error(),err);
         printf("%s\n",err);
-        free(err);
+        JNX_MEM_FREE(err);
+		return NULL;
     }
-    free(err);
+    JNX_MEM_FREE(err);
     return decrypt;
 }
 char *encrypt_message_with_signature(RSA *sender, RSA *receiver, char *message, size_t *encrypted_len) {
-	assert(sender);
-	assert(receiver);
+    assert(sender);
+    assert(receiver);
 
-	char *sig="SiGnAtUrE4wHiSp";
+    char *sig="SiGnAtUrE4wHiSp";
 }
 char *decrypt_signed_message(RSA *sender, RSA *receiver, char *encrypted, size_t encrypted_len, size_t *decrypted_len) {
-	assert(sender);
-	assert(receiver);
+    assert(sender);
+    assert(receiver);
 
-	char *sig="SiGnAtUrE4wHiSp";
+    char *sig="SiGnAtUrE4wHiSp";
 }
-
-

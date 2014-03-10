@@ -24,8 +24,6 @@
 #define PUB_EXP 3
 typedef enum key_type { PUBLIC, PRIVATE } key_type;
 
-
-
 RSA *generate_key(size_t len);
 
 void free_key(RSA *key);

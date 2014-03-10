@@ -44,7 +44,7 @@ static char *theirport = NULL;
 static char *theirip = NULL;
 static char *theirsecureport = NULL;
 RSA *mysessionkeypair= NULL;
-char *mysessionpublickeystr;
+char *mysessionpublickeystr = NULL;
 //Not really thread safe
 typedef enum session_command { START, REPLY } session_command;
 #define DELIMITER "||||"
@@ -61,16 +61,6 @@ char *build_payload(char *myguid, char *mypublickey, session_command s) {
     sprintf(buffer,"%s%s%s%s%s",session_command_s,DELIMITER,myguid,DELIMITER,mypublickey);
 
     return strdup(buffer);
-}
-char *wrap_and_send_my_key(char *incoming_publickey) {
-
-    size_t outlen;
-    char *encrypted_my_pubkey = encrypt_message(mysessionkeypair,
-                                strdup(incoming_publickey),&outlen);
-    return encrypted_my_pubkey;
-}
-char *decrypted_key_with_local(char *incoming_publickey) {
-    ///When we decrypt this with our private key, it will show their public key
 }
 int session_listener_callback(char *msg, size_t len , char *ip) {
     char *saveptr;
@@ -97,8 +87,6 @@ int session_listener_callback(char *msg, size_t len , char *ip) {
         ++n;
     }
     printf("Received [%s-%s]\n",incoming_command,incoming_guid);
-
-
 
     if(strcmp(incoming_command,"START") == 0) {
         ///you are being sent a start handshake request. Lets acknowledge this
@@ -149,8 +137,17 @@ int session_listener_callback(char *msg, size_t len , char *ip) {
     return 0;
 }
 int secure_server_callback(char *msg, size_t len, char *ip) {
+
+    assert(mysessionkeypair != NULL);
+    size_t olen;
+    char *decrypt = decrypt_message(mysessionkeypair,msg,strlen(msg),&olen);
+    if(!decrypt) {
+        printf("==========ERROR WITH TRANSMISSION============\n");
+    }
+
     printf("===========SECURE INCOMING TRANSMISSION============\n");
-    printf("%s\n",msg);
+    printf("RAW:%s\n",msg);
+    printf("DECRYPTED:%s -- [length:%zu]\n",decrypt,olen);
     printf("===================================================\n");
     return 0;
 }
@@ -224,19 +221,23 @@ int connectioncontrol_secure_message(char *msg) {
         printf("Not connected\n");
         return -1;
     }
+
+    if(strlen(msg) > RSA_size(mysessionkeypair)) {
+        printf("Message too large for transmission!\n");
+        return -1;
+    }
     assert(theirpublickey);
     assert(theirip);
     assert(theirsecureport);
 
-  	 
-	char *encrypt = msg;
-
-
-
-
+    RSA *theirkeypair = string_to_key(theirpublickey,PUBLIC);
+    assert(theirkeypair);
+    size_t olen;
+    char *encrypt = encrypt_message(theirkeypair,msg,&olen);
 
     printf("===========SECURE OUTGOING TRANSMISSION============\n");
-    printf("%s\n",encrypt);
+    printf("RAW:%s\n",msg);
+    printf("ENCRYPTED:%s\n",encrypt);
     printf("===================================================\n");
 
     secure_socket_connector = jnx_socket_tcp_create(AF_INET);
@@ -250,11 +251,9 @@ int connectioncontrol_secure_message(char *msg) {
     return 0;
 }
 void connectioncontrol_stop(void) {
-	
-	///Free things that need to be freed
-	//null things
 
-	connected = 0;
+    ///Free things that need to be freed
+    //null things
+
+    connected = 0;
 }
-
-
