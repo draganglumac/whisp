@@ -46,6 +46,8 @@ void user_start_session(char *foriegn_peer_guid) {
                 assert(s->local_peer == local_peer);
                 assert(s->foriegn_peer == foriegn_peer);
 
+				authentication_start_session_from_convo(s);
+
             } else {
                 printf("An existing session was found!\n");
             }
