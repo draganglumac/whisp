@@ -28,7 +28,7 @@ Structure
 			Passive listener<---TCP CONNECTION---
 
 	 o      User convo selection---TCP CONNECTION--->
-	\|/     
+	\|/        -----SWITCH TO SECURE SOCKET-----
 	 |            [ SESSSION CREATION ]
 	/ \ 		  [ CRYPTO AUTHENTICATION]
 			      [   CHAT ESTABLISHED ]
