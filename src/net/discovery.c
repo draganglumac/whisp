@@ -24,7 +24,7 @@
 #include "discovery.h"
 #include "serialization.h"
 #include "peerstore.h"
-
+#include "local_macro.h"
 jnx_hashmap *configuration;
 typedef int clock_interval;
 static clock_interval interval = 5;

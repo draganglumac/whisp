@@ -20,8 +20,6 @@
 #include <jnxc_headers/jnxsocket.h>
 #include <jnxc_headers/jnxhash.h>
 #include "peerstore.h"
-#define ASYNC_START(X,Y)\
-	jnx_thread_create_disposable(X,Y);
 
 typedef struct thread_data {
     char* port;

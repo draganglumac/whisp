@@ -19,7 +19,10 @@
 #define __PASSIVE_H__
 #include "authentication.h"
 #include "peerstore.h"
-void passive_listener_start(jnx_hashmap *configuration);
+void* passive_listener_start(void *args);
+
+void passive_listener_setup(jnx_hashmap *configuration);
+
 void passive_listener_stop();
 
 #endif

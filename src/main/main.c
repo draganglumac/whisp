@@ -21,7 +21,7 @@
 #include <jnxc_headers/jnxfile.h>
 #include <jnxc_headers/jnxlog.h>
 #include <jnxc_headers/jnxthread.h>
-
+#include "local_macro.h"
 #include "app.h"
 #include "userinput.h"
 #include "discovery.h"
@@ -43,6 +43,8 @@ int main(int argc, char **argv) {
 	generate_guid(configuration);
 
 	discovery_setup(configuration);
+
+	passive_listener_setup(configuration);
 
 	serialiser_setup(configuration);
 
