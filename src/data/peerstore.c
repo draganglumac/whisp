@@ -19,9 +19,11 @@
 #include "peerstore.h"
 #include <jnxc_headers/jnxlist.h>
 #include <jnxc_headers/jnxlog.h>
+#include <jnxc_headers/jnxhash.h>
 #include <jnxc_headers/jnxthread.h>
 #include <unistd.h>
 #include <string.h>
+extern jnx_hashmap *configuration;
 static jnx_thread_mutex store_lock;
 static jnx_btree *store = NULL;
 
@@ -79,7 +81,11 @@ void peerstore_print_peers() {
 
         raw_peer *rp= jnx_btree_lookup(store,keys->head->_data);
         if(rp) {
-            printf("%d)%s\n",count,rp->guid);
+ 			if(strcmp(rp->guid,jnx_hash_get(configuration,"GUID")) == 0) {
+ 			printf("%d)%s [Local]\n",count,rp->guid);
+			}else {
+ 			printf("%d)%s [Foriegn]\n",count,rp->guid);
+			}
         }
         ++count;
         keys->head = keys->head->next_node;
