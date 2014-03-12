@@ -20,10 +20,6 @@
 #include "sessioncontrol.h"
 #include <jnxc_headers/jnxhash.h>
 
-void authentication_passive_listen(jnx_hashmap *configuration); 
-// This is where session requests will be transmitted over the tcp socket
-void authentication_start_session_from_incoming_convo(session *s);
-
-void authentication_start_session_from_convo(session *s);
+void authentication_start_with_session(session *s);
 
 #endif

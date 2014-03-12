@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include "authentication.h"
 #include <jnxc_headers/jnxmem.h>
+#include <jnxc_headers/jnxlog.h>
 #include <jnxc_headers/jnxhash.h>
 #include "peerstore.h"
 #include "local_macro.h"
@@ -36,15 +37,39 @@ void authentication_update_foriegn_session(session *s) {
     JNX_MEM_FREE(buffer);
     jnx_socket_destroy(&sec);
 }
-void authentication_start_session_from_incoming_convo(session *s) {
-	
-	//Recipiant gets here and reads the session command
-}
+void authentication_start_with_session(session *s) {
 
-void authentication_start_session_from_convo(session *s) {
-
-	authentication_update_foriegn_session(s);
+	if(strcmp(jnx_hash_get(configuration,"GUID"),s->session_origin_guid) == 0) {
+		printf("Sharing session...\n");
+		authentication_update_foriegn_session(s);
+	}
 
 	///after telling our recipiant about the new session we'll wait for them to reply
+	state current_state;
+	while((current_state = session_get_state(s->session_id)) != SESSION_CONNECTED) {
+		switch(current_state) {
+			case SESSION_ERROR:
+				
+				JNX_LOGC("SESSION ERROR\n");
+				break;
+			case SESSION_PRE_HANDSHAKE:
+
+				JNX_LOGC("SESSION PRE HANDSHAKE\n");
+				break;
+			case SESSION_PUBLIC_KEY_EXCHANGE:
+
+				JNX_LOGC("SESSION KEY EXCHANGE\n");
+				break;
+			case SESSION_HANDSHAKING:
+				JNX_LOGC("SESSION HANDSHAKING\n");
+				break;
+			case SESSION_CONNECTED:
+				JNX_LOGC("SESSION CONNECTED\n");
+				break;
+		}
+		sleep(5);
+	}
+
+	printf("Session Connected\n");
 }
 

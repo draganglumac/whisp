@@ -68,6 +68,7 @@ state session_get_state(char *session_id) {
 	}		
 	session *s = jnx_btree_lookup(session_tree,session_id);
 	if(!s) { 
+		printf("Session not found\n");
 		return SESSION_ERROR;
 	}
 	return s->current_state;
@@ -86,12 +87,18 @@ char * session_create(raw_peer *local, raw_peer *foriegn) {
 	session *s = JNX_MEM_MALLOC(sizeof(session));
 	s->local_peer = local;
 	s->foriegn_peer = foriegn;
-	s->shared_secret = session_generate_secret();
+// 	s->shared_secret = session_generate_secret();
 	s->current_state = SESSION_PRE_HANDSHAKE;
 	s->session_id = session_generate_id();
-
+	s->session_origin_guid = local->guid;
 	jnx_btree_add(session_tree,s->session_id,s);
 	return s->session_id;
+}
+void session_add(session *s) {
+	if(!session_tree) {
+		session_tree = jnx_btree_create(sizeof(int),session_tree_compare);
+	}
+	jnx_btree_add(session_tree,s->session_id,s);
 }
 void session_destroy(session *s) { 
 	assert(s);

@@ -47,7 +47,7 @@ void user_start_session(char *foriegn_peer_guid) {
                 assert(s->foriegn_peer == foriegn_peer);
 
 				//AUTHENTICATION ENTRY POINT [BLOCKING UI FROM FURTHER AUTHS]
-				authentication_start_session_from_convo(s);
+				authentication_start_with_session(s);
 
             } else {
                 printf("An existing session was found!\n");

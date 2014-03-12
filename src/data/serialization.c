@@ -33,6 +33,7 @@
 #define SHARED_SECRET_KEY "SHARED_SECRET"
 #define CURRENT_STATE_KEY "CURRENT_STATE"
 #define SESSION_ID_KEY "SESSION_ID"
+#define SESSION_ORIGIN_GUID_KEY "SESSION_ORIGIN_GUID"
 #define DELIMITER ":"
 extern jnx_hashmap *configuration;
 jnx_thread_mutex peer_lock;
@@ -202,7 +203,7 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
         }
         if(strcmp(t,CURRENT_STATE_KEY) == 0) {
             int value = atoi(strtok_r(NULL,DELIMITER,&saveptr));
-            (*s)->current_state = value;
+			(*s)->current_state = value;
         }
         if(strcmp(t,SESSION_ID_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
@@ -214,6 +215,17 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
             }
             (*s)->session_id = strdup(value);
         }
+		if(strcmp(t,SESSION_ORIGIN_GUID_KEY) == 0) {
+            char *value = strtok_r(NULL,DELIMITER,&saveptr);
+            if(value == NULL) {
+                JNX_MEM_FREE((*s)->shared_secret);
+        		JNX_MEM_FREE((*s)->session_id);
+				JNX_MEM_FREE(*s);
+                *s = NULL;
+                return S_MALFORMED;
+            }
+			(*s)->session_origin_guid = strdup(value);
+		}
         t = strtok_r(NULL,DELIMITER,&saveptr);
     }
     return S_OKAY;
@@ -223,10 +235,10 @@ size_t serialize_session_data(char **outbuffer,session *s) {
     size_t len = 0;
 
     char *buffer = JNX_MEM_MALLOC(sizeof(char) * 1024);
-    const char *session_frame = "LOCAL_PEER:%s:FORIEGN_PEER:%s:SHARED_SECRET:%s:CURRENT_STATE:%d:SESSION_ID:%s:";
+    const char *session_frame = "LOCAL_PEER:%s:FORIEGN_PEER:%s:SHARED_SECRET:%s:CURRENT_STATE:%d:SESSION_ID:%s:SESSION_ORIGIN_GUID:%s:";
 
     len = sprintf(buffer,session_frame,s->local_peer->guid,s->foriegn_peer->guid,
-                  s->shared_secret,s->current_state,s->session_id);
+                  s->shared_secret,s->current_state,s->session_id,s->session_origin_guid);
 
     *outbuffer = buffer;
 
