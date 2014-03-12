@@ -127,7 +127,6 @@ void peerstore_update_peer(raw_peer *new_peer,raw_peer *updated_peer) {
 
 	free(updated_peer->peerstring);
 	updated_peer->peerstring = new_peer->peerstring;
-	printf("%s peer data updated!\n",updated_peer->guid);
 }
 void peerstore_delete_peer(raw_peer *rp) {
 

@@ -19,6 +19,7 @@
 #define __SERIALISER_H__
 #include <jnxc_headers/jnxhash.h>
 #include "peerstore.h"
+#include "sessioncontrol.h"
 typedef enum S_TYPES
 {
 	S_OKAY, S_GENERAL_ERROR, S_UNKNOWN, S_MALFORMED
@@ -29,6 +30,11 @@ void serializer_setup(jnx_hashmap *configuration);
 S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_message_len, char *interface_ip);
 
 size_t serialize_data(char **outbuffer,char *guid,char *command,char *port, char *secure_port,char *peerage);
+
+S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_message_len);
+
+size_t serialize_session_data(char **outbuffer,session *);
+
 
 #endif
 

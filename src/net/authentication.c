@@ -29,17 +29,26 @@ void authentication_start_session_from_incoming_convo(session *s) {
 
 void authentication_start_session_from_convo(session *s) {
     printf("Telling foriegn peer about local session...\n");
-    jnx_socket *sec = jnx_socket_tcp_create(AF_INET);
-    char *buffer;
-    size_t len = serialize_data(&buffer,s->local_peer->guid,"HANDSHAKE",
-                                s->local_peer->port,s->local_peer->secure_port,"PEER-NULL");
 
-    if(strcmp(jnx_hash_get(configuration,"DEBUG"),"YES") == 0) {
-        jnx_socket_tcp_send(sec,"localhost",s->foriegn_peer->port,buffer,strlen(buffer));
+
+	///Serialise session
+	
+	//send serialised session over to remote
+
+	jnx_socket *sec = jnx_socket_tcp_create(AF_INET);
+    char *buffer;
+	size_t len = serialize_session_data(&buffer,s);
+  
+  	if(strcmp(jnx_hash_get(configuration,"DEBUG"),"YES") == 0) {
+        jnx_socket_tcp_send(sec,"localhost",s->foriegn_peer->port,buffer,len);
     } else {
-        jnx_socket_tcp_send(sec,s->foriegn_peer->ip,s->foriegn_peer->port,buffer,strlen(buffer));
+        jnx_socket_tcp_send(sec,s->foriegn_peer->ip,s->foriegn_peer->port,buffer,len);
     }
     JNX_MEM_FREE(buffer);
     jnx_socket_destroy(&sec);
+
+
+
+
 }
 
