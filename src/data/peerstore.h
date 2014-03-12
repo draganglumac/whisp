@@ -42,4 +42,5 @@ int peerstore_add_peer(raw_peer *rp);
 
 void peerstore_delete_peer(raw_peer *rp);
 
+void peerstore_destroy();
 #endif

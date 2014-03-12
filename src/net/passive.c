@@ -24,7 +24,7 @@
 #include "local_macro.h"
 extern jnx_hashmap *configuration;
 static jnx_socket *passive_tcp_socket;
-
+static int is_not_exiting = 0;
 /*
  * The purpose here is to provide another entry point for a foriegn peer
  * to establish a session on both ends
@@ -45,7 +45,7 @@ int passive_listener_callback(char *msg, size_t msg_len, char *ip) {
 	printf("===========================\n");
 	///push this session object into the authentication
 
-    return 0;
+    return is_not_exiting;
 }
 void* passive_listener_start(void *args) {
 
@@ -62,5 +62,6 @@ void passive_listener_setup(jnx_hashmap *configuration) {
     ASYNC_START(passive_listener_start,tport);
 }
 void passive_listener_stop() {
-
+	jnx_socket_destroy(&passive_tcp_socket);
+	is_not_exiting = 1;	
 }

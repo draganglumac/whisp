@@ -33,3 +33,4 @@ typedef struct thread_data {
 
 void discovery_setup(jnx_hashmap *configuration);
 void *discovery_start(void *args);
+void discovery_teardown();

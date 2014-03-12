@@ -36,6 +36,7 @@ static jnx_thread_mutex clock_lock;
 static thread_data *multicast_listen_thrdata;
 static thread_data *multicast_send_thrdata;
 
+static int is_not_exiting = 0;
 
 ///////ASYNC THREAD////////
 void *multicast_serialization_process(void *args) {
@@ -80,7 +81,7 @@ int multicast_listener(char *msg, size_t len, char *ip) {
     thr->msg = msg;
     thr->ip = ip;
     ASYNC_START(multicast_serialization_process,thr);
-    return 0;
+    return is_not_exiting;
 }
 void *multicast_listen_start(void *args) {
     thread_data *data = (thread_data*)args;
@@ -141,7 +142,7 @@ void discovery_setup(jnx_hashmap *config) {
     ASYNC_START(multicast_listen_start,multicast_listen_thrdata);
 }
 void* discovery_start(void *args) {
-    while(1) {
+    while(is_not_exiting == 0) {
         if(!start_t) {
             jnx_thread_lock(&clock_lock);
         	multicast_pulse(multicast_send_thrdata);
@@ -162,6 +163,7 @@ void* discovery_start(void *args) {
     return 0;
 }
 void discovery_teardown() {
+	is_not_exiting = 1;
     jnx_socket_destroy(&multicast_pulse_out);
     jnx_socket_destroy(&multicast_pulse_in);
     JNX_MEM_FREE(multicast_send_thrdata);
