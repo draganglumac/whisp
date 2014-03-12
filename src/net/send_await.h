@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  connectioncontrol.h
+ *       Filename:  send_await.h
  *
  *    Description:  
  *
  *        Version:  1.0
- *        Created:  03/06/14 19:27:30
+ *        Created:  03/12/14 07:34:01
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -15,12 +15,10 @@
  *
  * =====================================================================================
  */
-#ifndef __CONNECTION_CONTROL_H__
-#define __CONNECTION_CONTROL_H__
+#ifndef __SEND_AWAIT_H__
+#define __SEND_AWAIT_H__
 
-void* connectioncontrol_setup(void *args);
-void connectioncontrol_stop(void);
-void* connectioncontrol_start(void *args);
-int  connectioncontrol_isconnected(void);
-int connectioncontrol_secure_message(char *msg);
+char *send_and_await(char *host,char *port, char *message,
+		char *rport,float timeout);
+
 #endif

@@ -22,7 +22,6 @@
 
 #include <jnxc_headers/jnxnetwork.h>
 #include <jnxc_headers/jnxmem.h>
-#include "connectioncontrol.h"
 #include "app.h"
 #include "serialization.h"
 #include "discovery.h"

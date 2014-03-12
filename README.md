@@ -18,3 +18,23 @@ Note
 - There are memory leaks where RSA keys are not cleaned
 - Multiple dangling pointers and other leaks where cleaning hasn't been done
 - Both clients MUST have each other on their peerstore lists before communicating
+
+
+
+Structure
+=========
+
+			Discovery---UDP MULTICAST--->
+			Passive listener<---TCP CONNECTION---
+
+	 o      User convo selection---TCP CONNECTION--->
+	\|/        -----SWITCH TO SECURE SOCKET-----
+	 |            [ SESSSION CREATION ]
+	/ \ 		  [ CRYPTO AUTHENTICATION]
+			      [   CHAT ESTABLISHED ]
+
+			<--------Encrypted P2P Session-------->
+
+
+
+
