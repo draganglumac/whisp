@@ -23,18 +23,7 @@
 #include "local_macro.h"
 extern jnx_hashmap *configuration;
 
-void authentication_start_session_from_incoming_convo(session *s) {
-
-}
-
-void authentication_start_session_from_convo(session *s) {
-    printf("Telling foriegn peer about local session...\n");
-
-
-	///Serialise session
-	
-	//send serialised session over to remote
-
+void authentication_update_foriegn_session(session *s) {
 	jnx_socket *sec = jnx_socket_tcp_create(AF_INET);
     char *buffer;
 	size_t len = serialize_session_data(&buffer,s);
@@ -46,9 +35,16 @@ void authentication_start_session_from_convo(session *s) {
     }
     JNX_MEM_FREE(buffer);
     jnx_socket_destroy(&sec);
+}
+void authentication_start_session_from_incoming_convo(session *s) {
+	
+	//Recipiant gets here and reads the session command
+}
 
+void authentication_start_session_from_convo(session *s) {
 
+	authentication_update_foriegn_session(s);
 
-
+	///after telling our recipiant about the new session we'll wait for them to reply
 }
 
