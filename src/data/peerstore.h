@@ -34,12 +34,12 @@ size_t peerstore_get_count();
 
 int peerstore_check_peer(char *guid,raw_peer **inpeer);
 
+void peerstore_update_peer(raw_peer *new_peer,raw_peer *updated_peer);
+
 void peerstore_print_peers();
 
 int peerstore_add_peer(raw_peer *rp);
 
-
+void peerstore_delete_peer(raw_peer *rp);
 
 #endif
-
-

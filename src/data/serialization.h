@@ -30,6 +30,5 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
 
 size_t serialize_data(char **outbuffer,char *guid,char *command,char *port, char *secure_port,char *peerage);
 
-
 #endif
 

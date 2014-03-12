@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include "peerstore.h"
 #include <jnxc_headers/jnxlist.h>
+#include <jnxc_headers/jnxmem.h>
 #include <jnxc_headers/jnxlog.h>
 #include <jnxc_headers/jnxhash.h>
 #include <jnxc_headers/jnxthread.h>
@@ -111,4 +112,32 @@ int peerstore_add_peer(raw_peer *rp) {
     printf("%s has come online!\n",rp->guid);
     jnx_thread_unlock(&store_lock);
     return 0;
+}
+void peerstore_update_peer(raw_peer *new_peer,raw_peer *updated_peer) {
+	assert(strcmp(new_peer->guid,updated_peer->guid) == 0);
+
+	free(updated_peer->command);
+	updated_peer->command = new_peer->command;
+
+	free(updated_peer->port);
+	updated_peer->port = new_peer->port;
+
+	free(updated_peer->secure_port);
+	updated_peer->secure_port = new_peer->secure_port;
+
+	free(updated_peer->peerstring);
+	updated_peer->peerstring = new_peer->peerstring;
+}
+void peerstore_delete_peer(raw_peer *rp) {
+
+	char *guid = rp->guid;
+	free(rp->command);
+	free(rp->port);
+	free(rp->secure_port);
+	free(rp->peerstring);
+	JNX_MEM_FREE(rp);	
+    jnx_thread_lock(&store_lock);
+	jnx_btree_remove(store,guid,NULL,NULL);
+    jnx_thread_unlock(&store_lock);
+	free(guid);
 }

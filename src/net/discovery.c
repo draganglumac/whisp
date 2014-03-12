@@ -42,16 +42,16 @@ void *multicast_serialization_process(void *args) {
     thread_data *p = (thread_data*)args;
     raw_peer *rp = NULL;
     S_TYPES ret = deserialize_data(&rp,p->msg,p->len,p->ip);
-	JNX_MEM_FREE(p);
+	jnx_mem_free(p);
     switch(ret) {
     case S_MALFORMED:
-        JNX_LOGC("Malformed deserialization data...\n");
+        JNX_LOGC("malformed deserialization data...\n");
         break;
     case S_GENERAL_ERROR:
-        JNX_LOGC("General error deserializing...\n");
+        JNX_LOGC("general error deserializing...\n");
         break;
     case S_UNKNOWN:
-        JNX_LOGC("Unknown error deserializing...\n");
+        JNX_LOGC("unknown error deserializing...\n");
         break;
     case S_OKAY:
         assert(rp);
@@ -63,8 +63,8 @@ void *multicast_serialization_process(void *args) {
         if(peerstore_check_peer(rp->guid,&handle) == 0) {
             peerstore_add_peer(rp);
         } else {
-            JNX_MEM_FREE(rp);
-        }
+        	peerstore_delete_peer(rp);
+		}
     }
     return 0;
 }

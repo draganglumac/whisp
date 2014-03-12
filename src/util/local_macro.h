@@ -28,6 +28,7 @@
 	jnx_socket *N = jnx_socket_tcp_create(QUICK_SOCKET_FAMILY); \
 	jnx_socket_tcp_send(N,X,Y,Z,strlen(Z)); \
 	jnx_socket_destroy(&N);
+
 #define QUICK_UDP(N,X,Y,Z)\
 	jnx_socket *N = jnx_socket_udp_create(QUICK_SOCKET_FAMILY); \
 	jnx_socket_udp_send(N,X,Y,Z,strlen(Z)); \
