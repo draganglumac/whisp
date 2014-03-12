@@ -146,7 +146,7 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
                 JNX_MEM_FREE(*s);
-				*s = NULL;
+                *s = NULL;
                 return S_MALFORMED;
             }
             if(strcmp(value,jnx_hash_get(configuration,"GUID")) == 0) {
@@ -172,7 +172,7 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
                 JNX_MEM_FREE(*s);
-				*s = NULL;
+                *s = NULL;
                 return S_MALFORMED;
             }
             if(strcmp(value,jnx_hash_get(configuration,"GUID")) == 0) {
@@ -191,29 +191,29 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
                 }
             }
         }
-		if(strcmp(t,SHARED_SECRET_KEY) == 0) {
+        if(strcmp(t,SHARED_SECRET_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
                 JNX_MEM_FREE(*s);
-				*s = NULL;
+                *s = NULL;
                 return S_MALFORMED;
             }
-			(*s)->shared_secret = strdup(value);
-		}
-		if(strcmp(t,CURRENT_STATE_KEY) == 0) {
-			int value = atoi(strtok_r(NULL,DELIMITER,&saveptr));
-			(*s)->current_state = value;
-		}
-		if(strcmp(t,SESSION_ID_KEY) == 0) {
+            (*s)->shared_secret = strdup(value);
+        }
+        if(strcmp(t,CURRENT_STATE_KEY) == 0) {
+            int value = atoi(strtok_r(NULL,DELIMITER,&saveptr));
+            (*s)->current_state = value;
+        }
+        if(strcmp(t,SESSION_ID_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
-				JNX_MEM_FREE((*s)->shared_secret);
+                JNX_MEM_FREE((*s)->shared_secret);
                 JNX_MEM_FREE(*s);
-				*s = NULL;
-				return S_MALFORMED;
+                *s = NULL;
+                return S_MALFORMED;
             }
-			(*s)->session_id = strdup(value);
-		}
+            (*s)->session_id = strdup(value);
+        }
         t = strtok_r(NULL,DELIMITER,&saveptr);
     }
     return S_OKAY;
@@ -232,4 +232,3 @@ size_t serialize_session_data(char **outbuffer,session *s) {
 
     return len;
 }
-
