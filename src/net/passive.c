@@ -56,7 +56,8 @@ int passive_listener_callback(char *msg, size_t msg_len, char *ip) {
 			///update peer command
 			peerstore_update_peer(rp,handle);	
 			printf("Look who wants to make a session with you,it's %s and he says %s\n",handle->guid,handle->command);
-        	peerstore_delete_peer(rp);
+
+
 		} else {
         	peerstore_delete_peer(rp);
         }
