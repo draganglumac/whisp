@@ -63,7 +63,10 @@ void *multicast_serialization_process(void *args) {
         if(peerstore_check_peer(rp->guid,&handle) == 0) {
             peerstore_add_peer(rp);
         } else {
-        	peerstore_delete_peer(rp);
+			peerstore_update_peer(rp,handle);
+			///Do not call peerstore_delete_peer
+			//We want to keep the peer data, but delete the peer struct!!!!!
+			JNX_MEM_FREE(rp);
 		}
     }
     return 0;

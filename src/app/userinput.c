@@ -46,6 +46,7 @@ void user_start_session(char *foriegn_peer_guid) {
                 assert(s->local_peer == local_peer);
                 assert(s->foriegn_peer == foriegn_peer);
 
+				//AUTHENTICATION ENTRY POINT [BLOCKING UI FROM FURTHER AUTHS]
 				authentication_start_session_from_convo(s);
 
             } else {
