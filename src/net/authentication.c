@@ -62,7 +62,9 @@ void authentication_start_with_session(session *s) {
             JNX_LOGC("SESSION PRE HANDSHAKE\n");
 	
 			s->local_keypair = generate_key(2048);
-			
+			///this will be swapped on remote
+			s->local_public_key = key_to_string(s->local_keypair,PUBLIC);
+
 			JNX_LOGC("Generated local keypair\n");
 			//I want your keys!
 			s->current_state = SESSION_PUBLIC_KEY_EXCHANGE;
@@ -75,6 +77,8 @@ void authentication_start_with_session(session *s) {
         case SESSION_PUBLIC_KEY_EXCHANGE:
 			JNX_LOGC("Okay foreign peer is returning public key...\n");
 			s->local_keypair = generate_key(2048);
+			///this will be swapped on remote
+			s->local_public_key = key_to_string(s->local_keypair,PUBLIC);
 
 			///Now you have my key, lets shake on it!
 			s->current_state = SESSION_HANDSHAKING;

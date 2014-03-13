@@ -89,6 +89,7 @@ char * session_create(raw_peer *local, raw_peer *foriegn) {
     s->local_peer = local;
     s->foriegn_peer = foriegn;
     s->shared_secret = NULL;
+	s->local_public_key = NULL;
 	s->foriegn_public_key = NULL;
 	s->local_keypair = NULL;
     s->current_state = SESSION_PRE_HANDSHAKE;
@@ -114,6 +115,10 @@ void session_destroy(session *s) {
 	if(s->foriegn_public_key) {
 		JNX_LOGC("Deleting session foriegn public key...\n");
 		free(s->foriegn_public_key);
+	}
+	if(s->local_public_key) {
+		JNX_LOGC("Deleting session public key...\n");
+		free(s->local_public_key);
 	}
 	if(s->local_keypair) {
 		JNX_LOGC("Deleting session keypair...\n");
