@@ -103,13 +103,25 @@ void authentication_start_with_session(session *s) {
 			JNX_LOGC("ENCRYPTED SHARED KEY [%s]\n",encrypted);	
 			///encrypt with [session_orig_guid public key]
 			///FOR NOW I WILL TAKE IT ON FAITH, WE ALWAYS SET LOCAL_PUBLIC_KEY AS MESSAGE ORIGINATOR
+			
+			s->shared_secret = encrypted;
 			s->current_state = SESSION_CONNECTED;	
-    		authentication_update_foriegn_session(s);
-
+    		
+			authentication_update_foriegn_session(s);
+			///FREE FREE FREE FREE
+			///FREE FREE FREE FREE
+			///FREE FREE FREE FREE
+			///FREE FREE FREE FREE
+			///FREE FREE FREE FREE
 			JNX_LOGC("SESSION HANDSHAKING\n");
             break;
         case SESSION_CONNECTED:
     		printf("Session Connected\n");
+			
+			size_t len;
+			char *decrypted = decrypt_message(s->local_keypair,s->shared_secret,
+				strlen(s->shared_secret),&len);	
+			printf("Unencrypted shared secret --- [%s]\n",decrypted);
             break;
         }
         sleep(5);

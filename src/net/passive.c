@@ -49,7 +49,7 @@ int passive_listener_callback(char *msg, size_t msg_len, char *ip) {
     printf("SESSION LOCAL PEER:%s\n",new_session->local_peer->guid);
     printf("SESSION FORIEGN PEER:%s\n",new_session->foriegn_peer->guid);
     printf("SESSION STATE:%d\n",new_session->current_state);
-	printf("LOCAL(Possibly remote)PUBLIC KEY: %s\n",new_session->local_public_key);
+	printf("LOCAL(session_orig_guid peer)PUBLIC KEY: %s\n",new_session->local_public_key);
 	printf("FORIEGN(Possibly local)PUBLIC KEY: %s\n",new_session->foriegn_public_key);
 	printf("===========================\n");
 
