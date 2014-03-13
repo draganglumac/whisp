@@ -27,14 +27,19 @@ typedef enum S_TYPES
 
 void serializer_setup(jnx_hashmap *configuration);
 
+
+
 S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_message_len, char *interface_ip);
 
 size_t serialize_data(char **outbuffer,char *guid,char *command,char *port, char *secure_port,char *peerage);
 
-S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_message_len);
 
-size_t serialize_session_data(char **outbuffer,session *);
 
+
+S_TYPES deserialize_session_data(session **s,size_t *is_update,char *raw_message, size_t raw_message_len);
+
+
+size_t serialize_session_data(char **outbuffer,session *s,char *is_update);
 
 #endif
 

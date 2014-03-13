@@ -34,27 +34,33 @@ int passive_listener_callback(char *msg, size_t msg_len, char *ip) {
 
    	//deserialise session 
 	session *s;
-	S_TYPES ret = deserialize_session_data(&s,msg,msg_len);
+	size_t is_update;
+	S_TYPES ret = deserialize_session_data(&s,&is_update,msg,msg_len);
 	free(msg);
 	if(ret != S_OKAY) {
 		printf("Deserialization error from passive listener\n");
 		return is_not_exiting;
 	}	
+	///okay now we have deserialised this message, is it an update?
+	
+
 	printf("Incoming session ==========\n");
 	printf("SESSION ID:%s\n",s->session_id);
+	printf("SESSION ORIGIN:%s\n",s->session_origin_guid);
 	printf("SESSION SHARED SECRET:%s\n",s->shared_secret);
 	printf("SESSION LOCAL PEER:%s\n",s->local_peer->guid);
 	printf("SESSION FORIEGN PEER:%s\n",s->foriegn_peer->guid);
 	printf("SESSION STATE:%d\n",s->current_state);
 	printf("===========================\n");
-	///push this session object into the authentication
 
+	///Careful with replication!!!!!!!!!!!	
 	if(!session_check_exists(s->local_peer,s->foriegn_peer)) {
-		printf("Adding new session...\n");
 		session_add(s);
-	} else {
+	}
+	
+	if(is_update) {
+		JNX_LOGC("Received update... RESOLVING CHANGES\n");
 
-		///TODO: SESSION UPDATE
 	}
 
 	authentication_start_with_session(s);

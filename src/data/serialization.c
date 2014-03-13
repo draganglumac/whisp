@@ -28,6 +28,7 @@
 #define PORT_KEY "TPORT"
 #define SECUREPORT_KEY "SECUREPORT"
 #define PEERAGE_KEY "PEERAGE"
+#define UPDATE_KEY "IS_UPDATE"
 #define LOCAL_PEER_KEY "LOCAL_PEER"
 #define FORIEGN_PEER_KEY "FORIEGN_PEER"
 #define SHARED_SECRET_KEY "SHARED_SECRET"
@@ -134,7 +135,7 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
     }
     return S_OKAY;
 }
-S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_message_len) {
+S_TYPES deserialize_session_data(session **s,size_t *is_update,char *raw_message, size_t raw_message_len) {
     if(raw_message_len == 0) {
         return S_MALFORMED;
     }
@@ -142,7 +143,19 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
     char *t = strtok_r(raw_message,DELIMITER,&saveptr);
     *s = JNX_MEM_MALLOC(sizeof(session));
     while(t != NULL) {
-
+		if(strcmp(t,UPDATE_KEY) == 0) {
+            char *value = strtok_r(NULL,DELIMITER,&saveptr);
+            if(value == NULL) {
+                JNX_MEM_FREE(*s);
+                *s = NULL;
+                return S_MALFORMED;
+            }
+			if(strcmp(value,"YES") == 0) {
+				*is_update = 1;
+			} else {
+				*is_update = 0;
+			}
+		}
         if(strcmp(t,LOCAL_PEER_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
@@ -203,7 +216,7 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
         }
         if(strcmp(t,CURRENT_STATE_KEY) == 0) {
             int value = atoi(strtok_r(NULL,DELIMITER,&saveptr));
-			(*s)->current_state = value;
+            (*s)->current_state = value;
         }
         if(strcmp(t,SESSION_ID_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
@@ -215,32 +228,32 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
             }
             (*s)->session_id = strdup(value);
         }
-		if(strcmp(t,SESSION_ORIGIN_GUID_KEY) == 0) {
+        if(strcmp(t,SESSION_ORIGIN_GUID_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
                 JNX_MEM_FREE((*s)->shared_secret);
-        		JNX_MEM_FREE((*s)->session_id);
-				JNX_MEM_FREE(*s);
+                JNX_MEM_FREE((*s)->session_id);
+                JNX_MEM_FREE(*s);
                 *s = NULL;
                 return S_MALFORMED;
             }
-			(*s)->session_origin_guid = strdup(value);
-		}
+            (*s)->session_origin_guid = strdup(value);
+        }
         t = strtok_r(NULL,DELIMITER,&saveptr);
     }
     return S_OKAY;
 }
 
-size_t serialize_session_data(char **outbuffer,session *s) {
+size_t serialize_session_data(char **outbuffer,session *s,char *is_update) {
     size_t len = 0;
 
     char *buffer = JNX_MEM_MALLOC(sizeof(char) * 1024);
-    const char *session_frame = "LOCAL_PEER:%s:FORIEGN_PEER:%s:SHARED_SECRET:%s:CURRENT_STATE:%d:SESSION_ID:%s:SESSION_ORIGIN_GUID:%s:";
+    const char *session_frame = "IS_UPDATE:%s:LOCAL_PEER:%s:FORIEGN_PEER:%s:SHARED_SECRET:%s:CURRENT_STATE:%d:SESSION_ID:%s:SESSION_ORIGIN_GUID:%s:";
 
-    len = sprintf(buffer,session_frame,s->local_peer->guid,s->foriegn_peer->guid,
+    len = sprintf(buffer,session_frame,is_update,s->local_peer->guid,s->foriegn_peer->guid,
                   s->shared_secret,s->current_state,s->session_id,s->session_origin_guid);
 
     *outbuffer = buffer;
-
     return len;
 }
+

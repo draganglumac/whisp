@@ -30,7 +30,8 @@ typedef struct session {
 	raw_peer *foriegn_peer;
 	//RSA keys
 	RSA *local_keypair;
-	RSA *foriegn_keypair;	
+	char *local_public_key;
+	char *foriegn_public_key;	
 	char *shared_secret;
 	state current_state;
 	char *session_id;
