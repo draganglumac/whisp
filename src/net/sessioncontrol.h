@@ -19,6 +19,7 @@
 #define __SESSIONCONTROL_H__
 #include "peerstore.h"
 typedef enum state {
+	SESSION_DORMANT,
 	SESSION_ERROR,
 	SESSION_PRE_HANDSHAKE, // <- all sessions start here
 	SESSION_PUBLIC_KEY_EXCHANGE,

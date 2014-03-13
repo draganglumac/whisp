@@ -19,6 +19,7 @@
 #include <jnxc_headers/jnxmem.h>
 #include <jnxc_headers/jnxlog.h>
 #include <jnxc_headers/jnxsocket.h>
+#include "encryption.h"
 #include "passive.h"
 #include "serialization.h"
 #include "local_macro.h"
@@ -40,8 +41,6 @@ int passive_listener_callback(char *msg, size_t msg_len, char *ip) {
         printf("Deserialization error from passive listener\n");
         return is_not_exiting;
     }
-    ///okay now we have deserialised this message, is it an update?
-
 
     printf("Incoming session ==========\n");
     printf("SESSION ID:%s\n",new_session->session_id);
@@ -62,9 +61,15 @@ int passive_listener_callback(char *msg, size_t msg_len, char *ip) {
     } else {
 		JNX_LOGC("Finding old session...\n");
 		session *old_session = session_get_session(new_session->session_id);
+
+		RSA *lkey = old_session->local_keypair;
+		assert(lkey);	
+		
 		JNX_LOGC("Deleting old session...\n");	
 		session_destroy(old_session);
 		session_add(new_session);
+			
+		new_session->local_keypair = lkey;
 	}
     authentication_start_with_session(new_session);
 
