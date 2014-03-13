@@ -25,10 +25,10 @@
 #include "local_macro.h"
 extern jnx_hashmap *configuration;
 
-void authentication_update_foriegn_session(session *s, char *is_update) {
+void authentication_update_foriegn_session(session *s) {
     jnx_socket *sec = jnx_socket_tcp_create(AF_INET);
     char *buffer;
-    size_t len = serialize_session_data(&buffer,s,is_update);
+    size_t len = serialize_session_data(&buffer,s);
 
     if(strcmp(jnx_hash_get(configuration,"DEBUG"),"YES") == 0) {
         jnx_socket_tcp_send(sec,"localhost",s->foriegn_peer->port,buffer,len);
@@ -50,6 +50,9 @@ void authentication_start_with_session(session *s) {
  *  <--- Acknowledge key with reciept
  *   A------Connected-------B
  */
+// local_public_key will spawn from session_orig_guid peer
+// remote_public_key will spawn from session target peer
+
 
     state current_state;
     while((current_state = session_get_state(s->session_id)) != SESSION_CONNECTED) {
@@ -71,24 +74,30 @@ void authentication_start_with_session(session *s) {
 			
     		if(strcmp(jnx_hash_get(configuration,"GUID"),s->session_origin_guid) == 0) {
       		  printf("Sharing session...\n");
-    		    authentication_update_foriegn_session(s,"NO");
+    		    authentication_update_foriegn_session(s);
   			  }
 			break;
         case SESSION_PUBLIC_KEY_EXCHANGE:
 			JNX_LOGC("Okay foreign peer is returning public key...\n");
 			s->local_keypair = generate_key(2048);
 			///this will be swapped on remote
-			s->local_public_key = key_to_string(s->local_keypair,PUBLIC);
+			s->foriegn_public_key = key_to_string(s->local_keypair,PUBLIC);
 
 			///Now you have my key, lets shake on it!
 			s->current_state = SESSION_HANDSHAKING;
 			///SEND UPDATE
-    		authentication_update_foriegn_session(s,"YES");
+    		authentication_update_foriegn_session(s);
 
             JNX_LOGC("SESSION KEY EXCHANGE\n");
             break;
         case SESSION_HANDSHAKING:
-            JNX_LOGC("SESSION HANDSHAKING\n");
+
+			JNX_LOGC("Got public keys. Time to encrypt a shared session key\n");
+
+			char *shared_key = session_generate_secret();
+			///encrypt with [session_orig_guid public key]
+
+			JNX_LOGC("SESSION HANDSHAKING\n");
             break;
         case SESSION_CONNECTED:
             JNX_LOGC("SESSION CONNECTED\n");

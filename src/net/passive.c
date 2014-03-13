@@ -32,38 +32,41 @@ static int is_not_exiting = 0;
  */
 int passive_listener_callback(char *msg, size_t msg_len, char *ip) {
 
-   	//deserialise session 
-	session *s;
-	size_t is_update;
-	S_TYPES ret = deserialize_session_data(&s,&is_update,msg,msg_len);
-	free(msg);
-	if(ret != S_OKAY) {
-		printf("Deserialization error from passive listener\n");
-		return is_not_exiting;
-	}	
-	///okay now we have deserialised this message, is it an update?
-	
+    //deserialise session
+    session *new_session;
+    S_TYPES ret = deserialize_session_data(&new_session,msg,msg_len);
+    free(msg);
+    if(ret != S_OKAY) {
+        printf("Deserialization error from passive listener\n");
+        return is_not_exiting;
+    }
+    ///okay now we have deserialised this message, is it an update?
 
-	printf("Incoming session ==========\n");
-	printf("SESSION ID:%s\n",s->session_id);
-	printf("SESSION ORIGIN:%s\n",s->session_origin_guid);
-	printf("SESSION SHARED SECRET:%s\n",s->shared_secret);
-	printf("SESSION LOCAL PEER:%s\n",s->local_peer->guid);
-	printf("SESSION FORIEGN PEER:%s\n",s->foriegn_peer->guid);
-	printf("SESSION STATE:%d\n",s->current_state);
+
+    printf("Incoming session ==========\n");
+    printf("SESSION ID:%s\n",new_session->session_id);
+    printf("SESSION ORIGIN:%s\n",new_session->session_origin_guid);
+    printf("SESSION SHARED SECRET:%s\n",new_session->shared_secret);
+    printf("SESSION LOCAL PEER:%s\n",new_session->local_peer->guid);
+    printf("SESSION FORIEGN PEER:%s\n",new_session->foriegn_peer->guid);
+    printf("SESSION STATE:%d\n",new_session->current_state);
+	printf("LOCAL(Possibly remote)PUBLIC KEY: %s\n",new_session->local_public_key);
+	printf("FORIEGN(Possibly local)PUBLIC KEY: %s\n",new_session->foriegn_public_key);
 	printf("===========================\n");
 
-	///Careful with replication!!!!!!!!!!!	
-	if(!session_check_exists(s->local_peer,s->foriegn_peer)) {
-		session_add(s);
+    ///Careful with replication!!!!!!!!!!!
+    if(!session_check_exists_by_id(new_session->session_id)) {
+		JNX_LOGC("[%s]SESSION DOES NOT EXIST CREATING - %d ACTIVE SESSSIONS...\n",
+				new_session->session_id,session_count());
+            session_add(new_session);
+    } else {
+		JNX_LOGC("Finding old session...\n");
+		session *old_session = session_get_session(new_session->session_id);
+		JNX_LOGC("Deleting old session...\n");	
+		session_destroy(old_session);
+		session_add(new_session);
 	}
-	
-	if(is_update) {
-		JNX_LOGC("Received update... RESOLVING CHANGES\n");
-
-	}
-
-	authentication_start_with_session(s);
+    authentication_start_with_session(new_session);
 
 
     return is_not_exiting;
@@ -83,6 +86,7 @@ void passive_listener_setup(jnx_hashmap *configuration) {
     ASYNC_START(passive_listener_start,tport);
 }
 void passive_listener_stop() {
-	jnx_socket_destroy(&passive_tcp_socket);
-	is_not_exiting = 1;	
+    jnx_socket_destroy(&passive_tcp_socket);
+    is_not_exiting = 1;
 }
+

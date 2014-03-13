@@ -36,10 +36,10 @@ size_t serialize_data(char **outbuffer,char *guid,char *command,char *port, char
 
 
 
-S_TYPES deserialize_session_data(session **s,size_t *is_update,char *raw_message, size_t raw_message_len);
+S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_message_len);
 
 
-size_t serialize_session_data(char **outbuffer,session *s,char *is_update);
+size_t serialize_session_data(char **outbuffer,session *s);
 
 #endif
 

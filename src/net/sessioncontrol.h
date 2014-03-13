@@ -38,6 +38,8 @@ typedef struct session {
 	char *session_origin_guid;
 }session;
 
+char *session_generate_secret();
+
 state session_get_state(char *session_id);
 
 char* session_create(raw_peer *local, raw_peer *foriegn);
@@ -50,4 +52,7 @@ void session_destroy(session *s);
 
 int session_check_exists(raw_peer *local, raw_peer *foriegn);
 
+int session_check_exists_by_id(char *session_id);
+
+int session_count();
 #endif
