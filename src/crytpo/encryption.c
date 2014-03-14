@@ -60,7 +60,9 @@ char* encrypt_message(RSA *keypair, char *message, size_t *out_encrypted_len) {
 	assert(message);
     char *encrypt = JNX_MEM_MALLOC(RSA_size(keypair));
     char *err = JNX_MEM_MALLOC(130);
-    if((*out_encrypted_len = RSA_public_encrypt(strlen(message)+1,(unsigned char*)message,
+
+	///Removing +1 on strlen seems to have an effect...
+    if((*out_encrypted_len = RSA_public_encrypt(strlen(message),(unsigned char*)message,
                              (unsigned char*)encrypt,keypair,RSA_PKCS1_OAEP_PADDING)) == -1) {
         ERR_load_crypto_strings();
         ERR_error_string(ERR_get_error(),err);

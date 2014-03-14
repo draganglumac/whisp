@@ -98,11 +98,15 @@ void authentication_start_with_session(session *s) {
 
         JNX_LOGC("UNENCRYPTED SHARED KEY [%s]\n",shared_key);
         size_t olen;
+
         RSA *their_pubpair = string_to_key(s->foriegn_public_key,PUBLIC);
+        JNX_LOGC("Using their foriegn key for encryption\n%s\n",key_to_string(their_pubpair,PUBLIC));
         char *encrypted = encrypt_message(their_pubpair,shared_key,&olen);
-        JNX_LOGC("ENCRYPTED SHARED KEY [%db][%s]\n",olen,encrypted);
+
+        JNX_LOGC("ENCRYPTED SHARED KEY [%dbbytes][%s]\n",olen,encrypted);
 
         s->shared_secret = encrypted;
+        s->shared_secret_len = olen;
         s->current_state = SESSION_CONNECTED;
 
         authentication_update_foriegn_session(s);
@@ -114,7 +118,7 @@ void authentication_start_with_session(session *s) {
         break;
     case SESSION_CONNECTED:
         printf("Session Connected\n");
-        printf("SESSION ID:%s\n",s->session_id);
+/*     printf("SESSION ID:%s\n",s->session_id);
         printf("SESSION ORIGIN:%s\n",s->session_origin_guid);
         printf("SESSION SHARED SECRET:%s\n",s->shared_secret);
         printf("SESSION LOCAL PEER:%s\n",s->local_peer->guid);
@@ -122,17 +126,14 @@ void authentication_start_with_session(session *s) {
         printf("SESSION STATE:%d\n",s->current_state);
         printf("LOCAL(session_orig_guid peer)PUBLIC KEY: %s\n",s->local_public_key);
         printf("FORIEGN(Possibly local)PUBLIC KEY: %s\n",s->foriegn_public_key);
-        printf("===========================\n");
-
-        printf("local private key :%s\n",key_to_string(s->local_keypair,PRIVATE));
-
-		printf("-------->keypair ptr %X\n",*s->local_keypair);
-        size_t len;
-
-        		char *decrypted = decrypt_message(s->local_keypair,s->shared_secret,
-        			strlen(s->shared_secret),&len);
-        		printf("Unencrypted shared secret --- [%s]\n",decrypted);
+         printf("===========================\n");
+*/
+ //       printf("local public key :%s\n",key_to_string(s->local_keypair,PUBLIC));
+   //     printf("local private key :%s\n",key_to_string(s->local_keypair,PRIVATE));
+		size_t len;
+        char *decrypted = decrypt_message(s->local_keypair,s->shared_secret,
+                                          s->shared_secret_len,&len);
+        printf("Unencrypted shared secret --- [%s] expected length %d\n",decrypted,s->shared_secret_len);
         break;
     }
 }
-

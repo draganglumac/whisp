@@ -61,14 +61,13 @@ int passive_listener_callback(char *msg, size_t msg_len, char *ip) {
 
 		if(old_session->local_keypair) {
 			new_session->local_keypair = old_session->local_keypair;
-			printf("------->keypair ptr %X\n",*new_session->local_keypair);
+			printf("shared secret len >>%d<<\n",new_session->shared_secret_len);
 //			printf("local pub %s\n",key_to_string(new_session->local_keypair,PUBLIC));
 //			printf("local pri %s\n",key_to_string(new_session->local_keypair,PRIVATE));
 		}
 		session_destroy(old_session);
 	}
     authentication_start_with_session(new_session);
-
 
     return is_not_exiting;
 }

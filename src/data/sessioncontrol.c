@@ -27,14 +27,14 @@ static jnx_btree *session_tree = NULL;
 
 char *session_generate_secret() {
     char *names[10] = {
-        "Alpha","Bravo","Charlie","Delta",
-        "Epsilon","Foxtrot","Gamma","Hugo",
-        "Indy","Jupiter"
+        "A","B","C","D",
+        "E","F","G","H",
+        "I","J"
     };
     int r = (rand() % 10),
         l = (rand() % 10),
         n = (rand() % 10);
-    char buffer[124];
+    char buffer[24];
     sprintf(buffer,
             "%s-%s-%s",names[r],names[l],names[n]);
     printf("SESSION SECRET: %s\n",buffer);
@@ -108,7 +108,8 @@ char * session_create(raw_peer *local, raw_peer *foriegn) {
     s->local_peer = local;
     s->foriegn_peer = foriegn;
     s->shared_secret = NULL;
-    s->local_public_key = NULL;
+   	s->shared_secret_len = 0;
+   	s->local_public_key = NULL;
     s->foriegn_public_key = NULL;
     s->local_keypair = NULL;
     s->current_state = SESSION_PRE_HANDSHAKE;

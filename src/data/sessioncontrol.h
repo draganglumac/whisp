@@ -34,6 +34,7 @@ typedef struct session {
 	char *local_public_key;
 	char *foriegn_public_key;	
 	char *shared_secret;
+	size_t shared_secret_len;
 	state current_state;
 	char *session_id;
 	char *session_origin_guid;

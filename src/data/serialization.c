@@ -37,6 +37,7 @@
 #define SESSION_ORIGIN_GUID_KEY "SESSION_ORIGIN_GUID"
 #define LOCAL_PUBLIC_KEY "LOCAL_PUBLIC_KEY"
 #define FORIEGN_PUBLIC_KEY "FORIEGN_PUBLIC_KEY"
+#define SHARED_SECRET_LEN_KEY "SHARED_SECRET_LEN"
 #define DELIMITER ":"
 extern jnx_hashmap *configuration;
 jnx_thread_mutex peer_lock;
@@ -253,7 +254,20 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
 			}
 			(*s)->foriegn_public_key = strdup(value);
 		}
-        
+		if(strcmp(t,SHARED_SECRET_LEN_KEY) == 0) {
+            char *value = strtok_r(NULL,DELIMITER,&saveptr);
+            if(value == NULL) {
+                JNX_MEM_FREE((*s)->shared_secret);
+                JNX_MEM_FREE((*s)->session_id);
+                JNX_MEM_FREE(*s);
+            	JNX_MEM_FREE((*s)->session_origin_guid);
+				JNX_MEM_FREE((*s)->local_public_key);
+				JNX_MEM_FREE((*s)->foriegn_public_key);
+				*s = NULL;
+				return S_MALFORMED;
+			}
+			(*s)->shared_secret_len = atoi(value);
+		} 
 		
 		t = strtok_r(NULL,DELIMITER,&saveptr);
     }
@@ -263,11 +277,11 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
 size_t serialize_session_data(char **outbuffer,session *s) {
     size_t len = 0;
     char *buffer = JNX_MEM_MALLOC(sizeof(char) * 6000);
-    const char *session_frame = "LOCAL_PEER:%s:FORIEGN_PEER:%s:SHARED_SECRET:%s:CURRENT_STATE:%d:SESSION_ID:%s:SESSION_ORIGIN_GUID:%s:LOCAL_PUBLIC_KEY:%s:FORIEGN_PUBLIC_KEY:%s:";
+    const char *session_frame = "LOCAL_PEER:%s:FORIEGN_PEER:%s:SHARED_SECRET:%s:CURRENT_STATE:%d:SESSION_ID:%s:SESSION_ORIGIN_GUID:%s:LOCAL_PUBLIC_KEY:%s:FORIEGN_PUBLIC_KEY:%s:SHARED_SECRET_LEN:%d:";
 
     len = sprintf(buffer,session_frame,s->local_peer->guid,s->foriegn_peer->guid,
                   s->shared_secret,s->current_state,s->session_id,s->session_origin_guid,
-				  s->local_public_key,s->foriegn_public_key);
+				  s->local_public_key,s->foriegn_public_key,s->shared_secret_len);
 
     *outbuffer = buffer;
     return len;
