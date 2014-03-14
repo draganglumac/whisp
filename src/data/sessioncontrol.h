@@ -45,7 +45,7 @@ state session_get_state(char *session_id);
 
 char* session_create(raw_peer *local, raw_peer *foriegn);
 
-session* session_get_session(char *session_id);
+int session_get_session(char *session_id, session **session_handle);
 
 void session_add(session *s);
 

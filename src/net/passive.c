@@ -41,35 +41,31 @@ int passive_listener_callback(char *msg, size_t msg_len, char *ip) {
         printf("Deserialization error from passive listener\n");
         return is_not_exiting;
     }
-
-    printf("Incoming session ==========\n");
-    printf("SESSION ID:%s\n",new_session->session_id);
-    printf("SESSION ORIGIN:%s\n",new_session->session_origin_guid);
-    printf("SESSION SHARED SECRET:%s\n",new_session->shared_secret);
-    printf("SESSION LOCAL PEER:%s\n",new_session->local_peer->guid);
-    printf("SESSION FORIEGN PEER:%s\n",new_session->foriegn_peer->guid);
-    printf("SESSION STATE:%d\n",new_session->current_state);
-	printf("LOCAL(session_orig_guid peer)PUBLIC KEY: %s\n",new_session->local_public_key);
-	printf("FORIEGN(Possibly local)PUBLIC KEY: %s\n",new_session->foriegn_public_key);
-	printf("===========================\n");
-
-    ///Careful with replication!!!!!!!!!!!
-    if(!session_check_exists_by_id(new_session->session_id)) {
-		JNX_LOGC("[%s]SESSION DOES NOT EXIST CREATING - %d ACTIVE SESSSIONS...\n",
-				new_session->session_id,session_count());
-            session_add(new_session);
+    printf("===========Incoming session [%s] ==========\n",new_session->session_id);
+    
+	if(!session_check_exists_by_id(new_session->session_id)) {
+		JNX_LOGC(">>>>>>>>>>>SESSION DOES NOT EXIST CREATING - %d ACTIVE SESSIONS...\n",session_count());
+			session_add(new_session);
     } else {
-		JNX_LOGC("Finding old session...\n");
-		session *old_session = session_get_session(new_session->session_id);
-
-		RSA *lkey = old_session->local_keypair;
-		assert(lkey);	
+		JNX_LOGC(">>>>>>>>>>FOUND EXISTING SESSSION\n");
+		session *old_session;
+		int ret = session_get_session(new_session->session_id,&old_session);
+		if(!ret) {
+			JNX_LOGC("Error getting old session :-(\n");
+			return 0;
+		}
+		JNX_LOGC(">>>>>>>>>UPDATING OLD SESSION\n");		
 		
-		JNX_LOGC("Deleting old session...\n");	
+		assert(old_session->session_origin_guid);
+		assert(old_session->session_id);
+
+		if(old_session->local_keypair) {
+			new_session->local_keypair = old_session->local_keypair;
+			printf("------->keypair ptr %X\n",*new_session->local_keypair);
+//			printf("local pub %s\n",key_to_string(new_session->local_keypair,PUBLIC));
+//			printf("local pri %s\n",key_to_string(new_session->local_keypair,PRIVATE));
+		}
 		session_destroy(old_session);
-		session_add(new_session);
-			
-		new_session->local_keypair = lkey;
 	}
     authentication_start_with_session(new_session);
 

@@ -40,10 +40,12 @@ void user_start_session(char *foriegn_peer_guid) {
         if(peerstore_check_peer(foriegn_peer_guid,&foriegn_peer)) {
 
             if(!session_check_exists(local_peer,foriegn_peer)) {
-                printf("Creating new session\n");
                 char *session_handle  = session_create(local_peer,foriegn_peer);
-                session *s = session_get_session(session_handle);
-                assert(s->local_peer == local_peer);
+                JNX_LOGC("CREATING NEW SESSION %s\n",session_handle);
+				session *s;
+				int ret = session_get_session(session_handle,&s);
+                assert(ret == 1);
+				assert(s->local_peer == local_peer);
                 assert(s->foriegn_peer == foriegn_peer);
 
 				//AUTHENTICATION ENTRY POINT [BLOCKING UI FROM FURTHER AUTHS]

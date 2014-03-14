@@ -74,15 +74,34 @@ state session_get_state(char *session_id) {
     }
     return s->current_state;
 }
-session* session_get_session(char *session_id) {
+int session_get_session(char *session_id, session **session_handle) {
     if(!session_tree) {
-        return NULL;
+        JNX_LOGC("Session get session: no tree found\n");
+        return 0;
     }
-    session *s = jnx_btree_lookup(session_tree,session_id);
-    return s;
+    JNX_LOGC("================Getting session [%s]===========\n",session_id);
+    jnx_list *keys = jnx_list_create();
+    jnx_btree_keys(session_tree,keys);
+
+    while(keys->head) {
+        if(strcmp(keys->head->_data,session_id) == 0) {
+            session *s = jnx_btree_lookup(session_tree,keys->head->_data);
+            if(s) {
+        		JNX_LOGC("Found valid session %s\n",s->session_id);
+				*session_handle = s;
+				assert(*session_handle);
+				jnx_list_destroy(&keys);
+                return 1;
+            }
+        }
+        keys->head = keys->head->next_node;
+    }
+    jnx_list_destroy(&keys);
+    return 0;
 }
 char * session_create(raw_peer *local, raw_peer *foriegn) {
     if(!session_tree) {
+        JNX_LOGC("Session create: no tree found; making\n");
         session_tree = jnx_btree_create(sizeof(int),session_tree_compare);
     }
     session *s = JNX_MEM_MALLOC(sizeof(session));
@@ -95,14 +114,20 @@ char * session_create(raw_peer *local, raw_peer *foriegn) {
     s->current_state = SESSION_PRE_HANDSHAKE;
     s->session_id = session_generate_id();
     s->session_origin_guid = local->guid;
-    jnx_btree_add(session_tree,s->session_id,s);
+    int c = session_count();
+    session_add(s);
+	assert(session_count() == (c+1));
     return s->session_id;
 }
 void session_add(session *s) {
     if(!session_tree) {
+        JNX_LOGC("SESSION ADD: No tree found, making...\n");
         session_tree = jnx_btree_create(sizeof(int),session_tree_compare);
     }
+    JNX_LOGC("=======================Adding to session tree [%s]============",s->session_id);
+    int n = session_count();
     jnx_btree_add(session_tree,s->session_id,s);
+    assert(session_count() == (n+1));
 }
 void session_destroy(session *s) {
     assert(s);
@@ -120,15 +145,12 @@ void session_destroy(session *s) {
         JNX_LOGC("Deleting session public key...\n");
         free(s->local_public_key);
     }
-    if(s->local_keypair) {
-        JNX_LOGC("Deleting session keypair...\n");
-        RSA_free(s->local_keypair);
-    }
     JNX_LOGC("Deleting session object...\n");
     JNX_MEM_FREE(s);
 }
 int session_check_exists(raw_peer *local, raw_peer *foriegn) {
     if(!session_tree) {
+        JNX_LOGC("Session check exists : no tree found, making\n");
         session_tree = jnx_btree_create(sizeof(int),session_tree_compare);
     }
     jnx_list *keys = jnx_list_create();
@@ -151,23 +173,37 @@ int session_check_exists(raw_peer *local, raw_peer *foriegn) {
 }
 int session_check_exists_by_id(char *session_id) {
     if(!session_tree) {
+        JNX_LOGC("BUILDING SESSION TREE\n");
         session_tree = jnx_btree_create(sizeof(int),session_tree_compare);
-    }
-    session *s = jnx_btree_lookup(session_tree,session_id);
-    if(!s) {
         return 0;
-    } else {
-        return 1;
     }
+    jnx_list *keys = jnx_list_create();
+    jnx_btree_keys(session_tree,keys);
+
+    while(keys->head) {
+        if(strcmp(keys->head->_data,session_id) == 0) {
+            session *s = jnx_btree_lookup(session_tree,keys->head->_data);
+            if(s) {
+        		JNX_LOGC("Found valid session %s\n",s->session_id);
+				jnx_list_destroy(&keys);
+                return 1;
+            }
+        }
+        keys->head = keys->head->next_node;
+    }
+    jnx_list_destroy(&keys);
+    return 0;
 }
 int session_count() {
-	if(!session_tree) {
-		return 0;
-	}
-	int n = 0;
-	jnx_list *l = jnx_list_create();
-	jnx_btree_keys(session_tree,l);
-	n = l->counter;
-	jnx_list_destroy(&l);
-	return n;
+    if(!session_tree) {
+        return 0;
+    }
+    int n = 0;
+    jnx_list *l = jnx_list_create();
+    jnx_btree_keys(session_tree,l);
+    n = l->counter;
+    jnx_list_destroy(&l);
+    return n;
 }
+
+
