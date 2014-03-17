@@ -17,7 +17,6 @@
  */
 #include <stdlib.h>
 #include "encryption.h"
-#include "des.h"
 #include <jnxc_headers/jnxmem.h>
 #include <jnxc_headers/jnxbase64.h>
 #include <jnxc_headers/jnxlog.h>

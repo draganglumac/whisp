@@ -96,22 +96,33 @@ void authentication_start_with_session(session *s) {
         s->shared_secret = encrypted;
         s->shared_secret_len = olen;
         s->current_state = SESSION_CONNECTED;
-
         authentication_update_foriegn_session(s);
 
-        free(shared_key);
         RSA_free(their_pubpair);
-
+		///Re-entrant for local peer - he wants to get to connected state also
         JNX_LOGC("SESSION HANDSHAKING\n");
-        break;
+        ///IMPORTANT: Retain the plaintext shared secret
+		s->shared_secret = shared_key;
+		authentication_start_with_session(s);
+
+		break;
     case SESSION_CONNECTED:
 		JNX_LOGC("SESSION CONNECTED\n");
 		size_t len;
+
+		if(strcmp(jnx_hash_get(configuration,"GUID"),s->session_origin_guid) == 0) {
+			printf("Local peer connected with shared secret of %s\n",s->shared_secret);	
+	
+	
+		}else {
         char *decrypted = decrypt_message(s->local_keypair,s->shared_secret,
                                           s->shared_secret_len,&len);
-        printf("Unencrypted shared secret --- [%s] expected length %d\n",decrypted,s->shared_secret_len);
-       	
+		s->shared_secret = decrypted;
+		printf("Foriegn peer connected with shared secret of %s\n",s->shared_secret);	
 
+
+
+		}
 		break;
     }
 }
