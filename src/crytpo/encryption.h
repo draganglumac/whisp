@@ -17,10 +17,12 @@
  */
 #ifndef __ENCRYPTION_H__
 #define __ENCRYPTION_H__
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include <openssl/err.h>
-#include <string.h>
 #define PUB_EXP 3
 typedef enum key_type { PUBLIC, PRIVATE } key_type;
 
@@ -35,9 +37,4 @@ char *key_to_string(RSA *keypair,key_type type);
 char* encrypt_message(RSA *keypair, char *message, size_t *out_encrypted_len);
 
 char *decrypt_message(RSA *keypair, char *encrypted_message, size_t encrypted_message_len, size_t *out_decrypted_len);
-
-char *encrypt_message_with_signature(RSA *sender, RSA *receiver, char *message, size_t *encrypted_len);
-
-char *decrypt_signed_message(RSA *sender, RSA *receiver, char *encrypted, size_t encrypted_len, size_t *decrypted_len);
-
 #endif

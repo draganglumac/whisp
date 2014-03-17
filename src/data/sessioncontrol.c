@@ -206,5 +206,3 @@ int session_count() {
     jnx_list_destroy(&l);
     return n;
 }
-
-
