@@ -58,7 +58,6 @@ size_t secure_channel_send(session *s, char *message, size_t msg_len) {
         jnx_socket_tcp_send(sec,s->foriegn_peer->ip,s->foriegn_peer->secure_port,buffer,strlen(buffer));
     }
 
-//	free(message);
 	free(buffer);
 	jnx_socket_destroy(&sec);
 }

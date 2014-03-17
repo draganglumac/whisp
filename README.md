@@ -24,17 +24,13 @@ Note
 Structure
 =========
 
-			Discovery---UDP MULTICAST--->
-			Passive listener<---TCP CONNECTION---
-
-	 o      User convo selection---TCP CONNECTION--->
-	\|/        -----SWITCH TO SECURE SOCKET-----
-	 |            [ SESSSION CREATION ]
-	/ \ 		  [ CRYPTO AUTHENTICATION]
-			      [   CHAT ESTABLISHED ]
-
-			<--------Encrypted P2P Session-------->
-
-
+	Discovery---UDP MULTICAST--->
+	Passive listener<---TCP CONNECTION		
+	[ Generate session keys ]
+	TCP transmit new session---> Replicate session store public key
+	<--- TCP transmit public key
+	Generate shared secret---> Store shared secret
+	[ Switch to secure socket ]
+	<-DES ENCRYPTED TRAFFIC->	
 
 
