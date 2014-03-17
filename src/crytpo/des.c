@@ -38,5 +38,19 @@ char *des_encrypt(char *key, char *msg, size_t size) {
 	return res;
 }
 char *des_decrypt(char *key, char *msg, size_t size) {
+	
+	static char *res;
+	int n = 0;
 
+	DES_cblock key2;
+	DES_key_schedule schedule;
+	
+	res = JNX_MEM_MALLOC(size);
+	memcpy(key2,key,8);
+	DES_set_odd_parity(&key2);
+	DES_set_key_checked(&key2, &schedule);
+
+	DES_cfb64_encrypt((unsigned char *)msg, (unsigned char *)res,
+			size, &schedule, &key2, &n, DES_DECRYPT);
+	return res;
 }
