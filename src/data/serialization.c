@@ -202,7 +202,7 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
                 *s = NULL;
                 return S_MALFORMED;
             }
-            (*s)->shared_secret = strdup(value);
+	 		(*s)->shared_secret = strdup(value);
         }
         if(strcmp(t,CURRENT_STATE_KEY) == 0) {
             int value = atoi(strtok_r(NULL,DELIMITER,&saveptr));
