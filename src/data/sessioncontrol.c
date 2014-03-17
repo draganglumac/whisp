@@ -27,9 +27,9 @@ static jnx_btree *session_tree = NULL;
 
 char *session_generate_secret() {
     char *names[10] = {
-        "A","B","C","D",
-        "E","F","G","H",
-        "I","J"
+        "Alpha","Beta","Charlie","Delta",
+        "Epsilon","Foxtrot","Gamma","Hugo",
+        "Ipswitch","Jupiter"
     };
     int r = (rand() % 10),
         l = (rand() % 10),
