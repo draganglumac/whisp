@@ -17,7 +17,6 @@
  */
 #ifndef __DES_H__
 #define __DES_H__
-
 char *des_encrypt(char *key, char *msg, size_t size);
 char *des_decrypt(char *key, char *msg, size_t size);
 #endif

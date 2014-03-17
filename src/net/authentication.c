@@ -46,17 +46,11 @@ void authentication_start_with_session(session *s) {
      *  <---- SESSION HANDSHAKE
      *      [ Exchanged keys ]
      * A --> Crypto sign session key --> B
-     *  <--- Acknowledge key with reciept
      *   A------Connected-------B
-     */
+     *   Use shared session secret key for symmetrical encryption
+	 */
 // local_public_key will spawn from session_orig_guid peer
 // remote_public_key will spawn from session target peer
-
-    ///need to find a way to stop constantly looping whilst waiting for other end
-    //
-    //
-    ///encrypt with [session_orig_guid public key]
-    ///FOR NOW I WILL TAKE IT ON FAITH, WE ALWAYS SET LOCAL_PUBLIC_KEY AS MESSAGE ORIGINATOR
     switch(s->current_state) {
     case SESSION_ERROR:
         JNX_LOGC("SESSION ERROR\n");
@@ -65,13 +59,10 @@ void authentication_start_with_session(session *s) {
         JNX_LOGC("SESSION PRE HANDSHAKE\n");
 
         s->local_keypair = generate_key(2048);
-        ///this will be swapped on remote
         s->local_public_key = key_to_string(s->local_keypair,PUBLIC);
 
         JNX_LOGC("Generated local keypair\n");
-        //I want your keys!
         s->current_state = SESSION_PUBLIC_KEY_EXCHANGE;
-        //HOW ARE WE PRESERVING LOCAL KEYPAIRS??
         if(strcmp(jnx_hash_get(configuration,"GUID"),s->session_origin_guid) == 0) {
             printf("Sharing session...\n");
             authentication_update_foriegn_session(s);
@@ -81,12 +72,9 @@ void authentication_start_with_session(session *s) {
     case SESSION_PUBLIC_KEY_EXCHANGE:
         JNX_LOGC("Okay foreign peer is returning public key...\n");
         s->local_keypair = generate_key(2048);
-        ///this will be swapped on remote
         s->foriegn_public_key = key_to_string(s->local_keypair,PUBLIC);
 
-        ///Now you have my key, lets shake on it!
         s->current_state = SESSION_HANDSHAKING;
-        ///SEND UPDATE
         authentication_update_foriegn_session(s); ///B------->>>>
 
         JNX_LOGC("SESSION KEY EXCHANGE\n");
@@ -117,23 +105,13 @@ void authentication_start_with_session(session *s) {
         JNX_LOGC("SESSION HANDSHAKING\n");
         break;
     case SESSION_CONNECTED:
-        printf("Session Connected\n");
-/*     printf("SESSION ID:%s\n",s->session_id);
-        printf("SESSION ORIGIN:%s\n",s->session_origin_guid);
-        printf("SESSION SHARED SECRET:%s\n",s->shared_secret);
-        printf("SESSION LOCAL PEER:%s\n",s->local_peer->guid);
-        printf("SESSION FORIEGN PEER:%s\n",s->foriegn_peer->guid);
-        printf("SESSION STATE:%d\n",s->current_state);
-        printf("LOCAL(session_orig_guid peer)PUBLIC KEY: %s\n",s->local_public_key);
-        printf("FORIEGN(Possibly local)PUBLIC KEY: %s\n",s->foriegn_public_key);
-         printf("===========================\n");
-*/
- //       printf("local public key :%s\n",key_to_string(s->local_keypair,PUBLIC));
-   //     printf("local private key :%s\n",key_to_string(s->local_keypair,PRIVATE));
+		
 		size_t len;
         char *decrypted = decrypt_message(s->local_keypair,s->shared_secret,
                                           s->shared_secret_len,&len);
         printf("Unencrypted shared secret --- [%s] expected length %d\n",decrypted,s->shared_secret_len);
+       	
+		JNX_LOGC("Session Connected\n");
         break;
     }
 }
