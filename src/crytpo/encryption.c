@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include "encryption.h"
 #include <jnxc_headers/jnxmem.h>
+#include <jnxc_headers/jnxlog.h>
 RSA *generate_key(size_t len) {
     srand(time(0));
     return RSA_generate_key(len,PUB_EXP,NULL,NULL);
@@ -60,9 +61,9 @@ char* encrypt_message(RSA *keypair, char *message, size_t *out_encrypted_len) {
 	assert(message);
     char *encrypt = JNX_MEM_MALLOC(RSA_size(keypair));
     char *err = JNX_MEM_MALLOC(130);
-
+	JNX_LOGC("encrypt message: raw strlen %d\n",strlen(message));
 	///Removing +1 on strlen seems to have an effect...
-    if((*out_encrypted_len = RSA_public_encrypt(strlen(message),(unsigned char*)message,
+    if((*out_encrypted_len = RSA_public_encrypt(strlen(message) +1,(unsigned char*)message,
                              (unsigned char*)encrypt,keypair,RSA_PKCS1_OAEP_PADDING)) == -1) {
         ERR_load_crypto_strings();
         ERR_error_string(ERR_get_error(),err);
@@ -77,6 +78,8 @@ char *decrypt_message(RSA *keypair, char *encrypted_message, size_t encrypted_me
 	assert(keypair);
 	assert(encrypted_message);
 	assert(encrypted_message_len);
+	JNX_LOGC("decrypt message: raw strlen %d\n",strlen(encrypted_message));
+	JNX_LOGC("The encrypted_message_len is %d\n",encrypted_message_len);
 	char *decrypt = JNX_MEM_MALLOC(RSA_size(keypair));
     char *err = JNX_MEM_MALLOC(130);
     if((*out_decrypted_len = RSA_private_decrypt(encrypted_message_len,(unsigned char*)encrypted_message,(unsigned char*)
