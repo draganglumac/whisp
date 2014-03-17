@@ -30,6 +30,7 @@ char *des_encrypt(char *key, char *msg, size_t size) {
 	DES_key_schedule schedule;
 
 	res = JNX_MEM_MALLOC(size);
+	bzero(res,size);
 	memcpy(key2,key,8);
 	DES_set_odd_parity(&key2);
 	DES_set_key_checked(&key2, &schedule);
@@ -38,8 +39,8 @@ char *des_encrypt(char *key, char *msg, size_t size) {
 			&key2,&n,DES_ENCRYPT);
 
 	size_t elen;
-	char *encoded = jnx_base64_encode(msg,size,&elen);
-	free(res);
+	char *encoded = jnx_base64_encode(res,size,&elen);
+	JNX_MEM_FREE(res);
 	return encoded;
 }
 char *des_decrypt(char *key, char *msg, size_t size) {
@@ -51,13 +52,14 @@ char *des_decrypt(char *key, char *msg, size_t size) {
 	DES_cblock key2;
 	DES_key_schedule schedule;
 	
-	res = JNX_MEM_MALLOC(size);
+	res = malloc(size);
+	bzero(res,size);
 	memcpy(key2,key,8);
 	DES_set_odd_parity(&key2);
 	DES_set_key_checked(&key2, &schedule);
 
 	DES_cfb64_encrypt((unsigned char *)msg, (unsigned char *)res,
 			size, &schedule, &key2, &n, DES_DECRYPT);
-	free(msg);
+	
 	return res;
 }

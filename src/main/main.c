@@ -23,6 +23,7 @@
 #include <jnxc_headers/jnxthread.h>
 #include "local_macro.h"
 #include "app.h"
+#include "secure_channel.h"
 #include "userinput.h"
 #include "discovery.h"
 extern jnx_hashmap *configuration;
@@ -60,7 +61,9 @@ int main(int argc, char **argv) {
 
     passive_listener_setup(configuration);
 
-    serialiser_setup(configuration);
+	secure_channel_setup(configuration);
+
+	serialiser_setup(configuration);
 
     // Calling it here before we use any of the OpenSSL API calls
     global_initialise_openSSL();
