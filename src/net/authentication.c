@@ -105,13 +105,17 @@ void authentication_start_with_session(session *s) {
         JNX_LOGC("SESSION HANDSHAKING\n");
         break;
     case SESSION_CONNECTED:
-		
+		JNX_LOGC("SESSION CONNECTED\n");
 		size_t len;
         char *decrypted = decrypt_message(s->local_keypair,s->shared_secret,
                                           s->shared_secret_len,&len);
         printf("Unencrypted shared secret --- [%s] expected length %d\n",decrypted,s->shared_secret_len);
        	
-		JNX_LOGC("Session Connected\n");
-        break;
+		
+        s->current_state = SESSION_CONNECTED;
+
+        authentication_update_foriegn_session(s);
+
+		break;
     }
 }
