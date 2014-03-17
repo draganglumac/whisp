@@ -111,10 +111,6 @@ void authentication_start_with_session(session *s) {
                                           s->shared_secret_len,&len);
         printf("Unencrypted shared secret --- [%s] expected length %d\n",decrypted,s->shared_secret_len);
        	
-		
-        s->current_state = SESSION_CONNECTED;
-
-        authentication_update_foriegn_session(s);
 
 		break;
     }
