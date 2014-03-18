@@ -26,6 +26,9 @@
 #include "local_macro.h"
 extern jnx_hashmap *configuration;
 
+state authentication_get_progress(session *s) {
+	return s->current_state;
+}
 void authentication_update_foriegn_session(session *s) {
     jnx_socket *sec = jnx_socket_tcp_create(AF_INET);
     char *buffer;
@@ -39,7 +42,7 @@ void authentication_update_foriegn_session(session *s) {
     JNX_MEM_FREE(buffer);
     jnx_socket_destroy(&sec);
 }
-void authentication_start_with_session(session *s) {
+state authentication_start_with_session(session *s) {
     /*
      *
      * A ---> PREHANDSHAKE
@@ -48,7 +51,7 @@ void authentication_start_with_session(session *s) {
      *      [ Exchanged keys ]
      * A --> Crypto sign session key --> B
      *   A------Connected-------B
-     *   Use shared session secret key for symmetrical encryption
+     *   Use shared session secret key for DES symmetrical encryption
      */
 // local_public_key will spawn from session_orig_guid peer
 // remote_public_key will spawn from session target peer
@@ -104,33 +107,34 @@ void authentication_start_with_session(session *s) {
         JNX_LOGC("SESSION HANDSHAKING\n");
         ///IMPORTANT: Retain the plaintext shared secret
         s->shared_secret = shared_key;
-        authentication_start_with_session(s);
-
+		authentication_start_with_session(s);
+		///we dont need to keep the encyrpted shared_secret locally
+		free(encrypted);
         break;
     case SESSION_CONNECTED:
         JNX_LOGC("SESSION CONNECTED\n");
         size_t len;
 
-
         if(strcmp(jnx_hash_get(configuration,"GUID"),s->session_origin_guid) == 0) {
             printf("Local peer connected with shared secret of %s\n",s->shared_secret);
 
             secure_channel_listener_resolve_with_session(s);
-
-
-			///TODO: remove this test code
-            sleep(2);
-            secure_channel_send(s,"Hello from Local peer",strlen("Hello from local peer")+1);
-			///TODO: remove this test code
-
+		
+			secure_channel_start_dialogue(s);
         } else {
-            char *decrypted = decrypt_message(s->local_keypair,s->shared_secret,
+
+			char *shared_secret = s->shared_secret;
+			char *decrypted = decrypt_message(s->local_keypair,shared_secret,
                                               s->shared_secret_len,&len);
             s->shared_secret = decrypted;
             printf("Foriegn peer connected with shared secret of %s\n",s->shared_secret);
             secure_channel_listener_resolve_with_session(s);
-
-        }
+			free(shared_secret);
+			
+			secure_channel_start_dialogue(s);
+			
+		}
         break;
     }
+	return s->current_state;
 }

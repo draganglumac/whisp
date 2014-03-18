@@ -80,3 +80,12 @@ void secure_channel_setup(jnx_hashmap *config) {
 	secure_socket = jnx_socket_tcp_create(AF_INET);
 	ASYNC_START(secure_listener_start,sport);
 }
+void secure_channel_start_dialogue(session *s) {
+	while(1) {
+		char *line;
+		size_t n;
+	
+		secure_channel_send(s,"All is well",strlen("All is well") +1);
+		sleep(2);
+	}
+}

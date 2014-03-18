@@ -22,4 +22,5 @@
 int secure_channel_listener_resolve_with_session(session *s);
 void secure_channel_setup(jnx_hashmap *configuration);
 size_t secure_channel_send(session *s, char *message, size_t msg_len);
+void secure_channel_start_dialogue(session *s);
 #endif
