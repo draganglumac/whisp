@@ -120,7 +120,6 @@ state authentication_start_with_session(session *s) {
 
             secure_channel_listener_resolve_with_session(s);
 		
-			secure_channel_start_dialogue(s);
         } else {
 
 			char *shared_secret = s->shared_secret;
@@ -130,9 +129,6 @@ state authentication_start_with_session(session *s) {
             printf("Foriegn peer connected with shared secret of %s\n",s->shared_secret);
             secure_channel_listener_resolve_with_session(s);
 			free(shared_secret);
-			
-			secure_channel_start_dialogue(s);
-			
 		}
         break;
     }

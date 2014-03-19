@@ -32,6 +32,29 @@ void trim(char *line) {
         line[ln] = '\0';
     }
 }
+void user_interact_session(char *session_id) {
+    session *s;
+    int r = session_get_session(session_id,&s);
+    if(r) {
+        printf("Found session.\n");
+        while(1) {
+            char *line;
+            size_t n;
+            if(getline(&line,&n,stdin) == -1) {
+            }
+            trim(line);
+        	char *outmsg = JNX_MEM_MALLOC(sizeof(char) * strlen(line) +1);
+			bzero(outmsg,strlen(line) +1);
+			memcpy(outmsg,line,strlen(line));
+			secure_channel_send(s,outmsg,strlen(line) +1);
+			JNX_MEM_FREE(outmsg);
+		}
+
+    } else {
+        printf("Unable to find session.\n");
+    }
+
+}
 void user_start_session(char *foriegn_peer_guid) {
 
     raw_peer *local_peer;
@@ -42,14 +65,14 @@ void user_start_session(char *foriegn_peer_guid) {
             if(!session_check_exists(local_peer,foriegn_peer)) {
                 char *session_handle  = session_create(local_peer,foriegn_peer);
                 JNX_LOGC("CREATING NEW SESSION %s\n",session_handle);
-				session *s;
-				int ret = session_get_session(session_handle,&s);
+                session *s;
+                int ret = session_get_session(session_handle,&s);
                 assert(ret == 1);
-				assert(s->local_peer == local_peer);
+                assert(s->local_peer == local_peer);
                 assert(s->foriegn_peer == foriegn_peer);
 
-				//AUTHENTICATION ENTRY POINT [BLOCKING UI FROM FURTHER AUTHS]
-				authentication_start_with_session(s);
+                //AUTHENTICATION ENTRY POINT [BLOCKING UI FROM FURTHER AUTHS]
+                authentication_start_with_session(s);
 
             } else {
                 printf("An existing session was found!\n");
@@ -79,5 +102,22 @@ void user_input_loop() {
 
             user_start_session(strdup(l));
         }
+        if(strcmp(line,"send") == 0) {
+            printf("Please enter the session GUID to establish messaging with...\n");
+            char *t;
+            size_t b;
+            getline(&t,&b,stdin);
+            if(n == 0) {
+                continue;
+            }
+            char *session_id = strndup(t,n);
+            trim(session_id);
+
+            user_interact_session(session_id);
+            free(session_id);
+        }
     }
 }
+
+
+
