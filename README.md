@@ -29,8 +29,8 @@ Structure
 	[ Generate session keys ]
 	TCP transmit new session---> Replicate session store public key
 	<--- TCP transmit public key
-	Generate shared secret---> Store shared secret
+	Generate asyemtrical shared secret---> Store shared secret
 	[ Switch to secure socket ]
-	<-DES ENCRYPTED TRAFFIC->	
+	<-Symmetrically encrypted messages>	
 
 
