@@ -6,11 +6,16 @@ P2P decentralised chat program in early pre-Alpha
 Usage
 =====
 
-Limited commands are
+Commands
 
 list  //Show guids of other chat clients nearby
-convo //Initiate secure connection to a guid
+convo //Initiate secure connection to a guid [ Pass guid ID as next input ]
 
+Once connection is established
+
+send //Will request to open the session for communication [ Pass session ID as next input ]
+
+-- All further input will be in session mode until Cntrl+C exit
 
 Note
 =====
