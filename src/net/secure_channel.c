@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <jnxc_headers/jnxlog.h>
+#include <jnxc_headers/jnxterm.h>
 #include <jnxc_headers/jnxsocket.h>
 #include <jnxc_headers/jnxmem.h>
 #include "secure_channel.h"
@@ -30,14 +31,14 @@ session *last_session = NULL;
 int secure_listener_callback(char *msg, size_t msg_len, char *ip) {
 
 	if(last_session) {
-		printf("Attempting to resolve message...\n");
+		JNX_LOGF("Attempting to resolve message...\n");
 
-		printf("Decrypting with %s\n",last_session->shared_secret);
+		JNX_LOGF("Decrypting with %s\n",last_session->shared_secret);
 		char *decrypted_message = des_decrypt(last_session->shared_secret,
 				msg,msg_len);
 
-		printf("decrypted message: %s\n",decrypted_message);
-		
+		JNX_LOGF("decrypted message: %s\n",decrypted_message);
+		jnx_term_printf_in_color(JNX_COL_MAGENTA,">%s\n",decrypted_message);		
 		free(decrypted_message);
 		free(msg);
 
@@ -49,7 +50,7 @@ size_t secure_channel_send(session *s, char *message, size_t msg_len) {
 
 	jnx_socket *sec = jnx_socket_tcp_create(AF_INET);
 	
-	printf("encrypting \n%s\nwith %s\n",message,s->shared_secret);
+	JNX_LOGF("encrypting \n%s\nwith %s\n",message,s->shared_secret);
 	char *buffer = des_encrypt(s->shared_secret,message,msg_len);
 
     if(strcmp(jnx_hash_get(configuration,"DEBUG"),"YES") == 0) {
@@ -73,7 +74,7 @@ void *secure_listener_start(void *args) {
 	return 0;
 }
 void secure_channel_setup(jnx_hashmap *config) {
-	printf("Starting secure socket channel...\n");
+	JNX_LOGF("Starting secure socket channel...\n");
 	configuration = config;
 	char *sport = jnx_hash_get(configuration,"SECUREPORT");
 	assert(sport);

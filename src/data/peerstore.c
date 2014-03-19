@@ -20,6 +20,7 @@
 #include <jnxc_headers/jnxlist.h>
 #include <jnxc_headers/jnxmem.h>
 #include <jnxc_headers/jnxlog.h>
+#include <jnxc_headers/jnxterm.h>
 #include <jnxc_headers/jnxhash.h>
 #include <jnxc_headers/jnxthread.h>
 #include <unistd.h>
@@ -109,8 +110,9 @@ int peerstore_add_peer(raw_peer *rp) {
     }
     jnx_thread_lock(&store_lock);
     jnx_btree_add(store,rp->guid,rp);
-    printf("%s has come online!\n",rp->guid);
-    jnx_thread_unlock(&store_lock);
+    jnx_term_printf_in_color(JNX_COL_GREEN,"%s has come online!\n",rp->guid);
+	
+	jnx_thread_unlock(&store_lock);
     return 0;
 }
 void peerstore_update_peer(raw_peer *new_peer,raw_peer *updated_peer) {

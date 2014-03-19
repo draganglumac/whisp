@@ -36,12 +36,14 @@ void user_interact_session(char *session_id) {
     session *s;
     int r = session_get_session(session_id,&s);
     if(r) {
-        printf("Found session.\n");
+        jnx_term_printf_in_color(JNX_COL_CYAN,"Found session.\n");
         while(1) {
+			jnx_term_color(JNX_COL_YELLOW);
             char *line;
             size_t n;
             if(getline(&line,&n,stdin) == -1) {
             }
+			jnx_term_default();
             trim(line);
         	char *outmsg = JNX_MEM_MALLOC(sizeof(char) * strlen(line) +1);
 			bzero(outmsg,strlen(line) +1);
@@ -51,7 +53,7 @@ void user_interact_session(char *session_id) {
 		}
 
     } else {
-        printf("Unable to find session.\n");
+        jnx_term_printf_in_color(JNX_COL_RED,"Unable to find session.\n");
     }
 
 }
@@ -64,7 +66,7 @@ void user_start_session(char *foriegn_peer_guid) {
 
             if(!session_check_exists(local_peer,foriegn_peer)) {
                 char *session_handle  = session_create(local_peer,foriegn_peer);
-                JNX_LOGC("CREATING NEW SESSION %s\n",session_handle);
+                JNX_LOGF("CREATING NEW SESSION %s\n",session_handle);
                 session *s;
                 int ret = session_get_session(session_handle,&s);
                 assert(ret == 1);
@@ -75,7 +77,7 @@ void user_start_session(char *foriegn_peer_guid) {
                 authentication_start_with_session(s);
 
             } else {
-                printf("An existing session was found!\n");
+                JNX_LOGF("An existing session was found!\n");
             }
         }
     }

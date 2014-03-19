@@ -158,16 +158,16 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
                 if(peerstore_check_peer(value,&local_peer)) {
                     (*s)->local_peer = local_peer;
                 } else {
-                    printf("Error retrieving local peer deserialisation data\n");
+                    JNX_LOGF("Error retrieving local peer deserialisation data\n");
                 }
 
             } else {
-                printf("Recieved session being deserialised holds a local peer that is not own,swapping out to foriegn peer\n");
+                JNX_LOGF("Recieved session being deserialised holds a local peer that is not own,swapping out to foriegn peer\n");
                 raw_peer *foriegn_peer;
                 if(peerstore_check_peer(value,&foriegn_peer)) {
                     (*s)->foriegn_peer = foriegn_peer;
                 } else {
-                    printf("Error retrieving local copy of foriegn peer!\n");
+                    JNX_LOGF("Error retrieving local copy of foriegn peer!\n");
                 }
 
             }
@@ -184,14 +184,14 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
                 if(peerstore_check_peer(value,&local_peer)) {
                     (*s)->local_peer = local_peer;
                 } else {
-                    printf("Error retrieving local peer deserialisation data\n");
+                    JNX_LOGF("Error retrieving local peer deserialisation data\n");
                 }
             } else {
                 raw_peer *foriegn_peer;
                 if(peerstore_check_peer(value,&foriegn_peer)) {
                     (*s)->foriegn_peer = foriegn_peer;
                 } else {
-                    printf("Error retrieving local copy of foriegn peer!\n");
+                    JNX_LOGF("Error retrieving local copy of foriegn peer!\n");
                 }
             }
         }

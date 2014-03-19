@@ -38,13 +38,13 @@ int passive_listener_callback(char *msg, size_t msg_len, char *ip) {
     S_TYPES ret = deserialize_session_data(&new_session,msg,msg_len);
     free(msg);
     if(ret != S_OKAY) {
-        printf("Deserialization error from passive listener\n");
+        JNX_LOGF("Deserialization error from passive listener\n");
         return is_not_exiting;
     }
-    printf("===========Incoming session [%s] ==========\n",new_session->session_id);
+    JNX_LOGF("===========Incoming session [%s] ==========\n",new_session->session_id);
     
 	if(!session_check_exists_by_id(new_session->session_id)) {
-		JNX_LOGC(">>>>>>>>>>>SESSION DOES NOT EXIST CREATING - %d ACTIVE SESSIONS...\n",session_count());
+		JNX_LOGF(">>>>>>>>>>>SESSION DOES NOT EXIST CREATING - %d ACTIVE SESSIONS...\n",session_count());
 			session_add(new_session);
     } else {
 
@@ -52,7 +52,7 @@ int passive_listener_callback(char *msg, size_t msg_len, char *ip) {
 		session *old_session;
 		int ret = session_get_session(new_session->session_id,&old_session);
 		if(!ret) {
-			JNX_LOGC("Error getting old session :-(\n");
+			JNX_LOGF("Error getting old session :-(\n");
 			return 0;
 		}
 		assert(old_session->session_origin_guid);
@@ -84,7 +84,7 @@ void* passive_listener_start(void *args) {
 void passive_listener_setup(jnx_hashmap *configuration) {
     char *tport = jnx_hash_get(configuration,"TPORT");
     assert(tport);
-    printf("Enabling passive TCP listener...\n");
+    JNX_LOGF("Enabling passive TCP listener...\n");
     passive_tcp_socket = jnx_socket_tcp_create(AF_INET);
     ASYNC_START(passive_listener_start,tport);
 }

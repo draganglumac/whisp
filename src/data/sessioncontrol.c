@@ -37,7 +37,7 @@ char *session_generate_secret() {
     char buffer[24];
     sprintf(buffer,
             "%s-%s-%s",names[r],names[l],names[n]);
-    printf("SESSION SECRET: %s\n",buffer);
+    JNX_LOGF("SESSION SECRET: %s\n",buffer);
     return strdup(buffer);
 }
 char *session_generate_id() {
@@ -50,7 +50,7 @@ char *session_generate_id() {
         sprintf(micro, "%u", g[i]);
         strcat(buffer, micro);
     }
-    printf("SESSION ID: %s\n", buffer);
+    JNX_LOGF("SESSION ID: %s\n", buffer);
     assert(buffer);
     return strdup(buffer);
 }
@@ -69,17 +69,17 @@ state session_get_state(char *session_id) {
     }
     session *s = jnx_btree_lookup(session_tree,session_id);
     if(!s) {
-        printf("Session not found\n");
+        JNX_LOGF("Session not found\n");
         return SESSION_ERROR;
     }
     return s->current_state;
 }
 int session_get_session(char *session_id, session **session_handle) {
     if(!session_tree) {
-        JNX_LOGC("Session get session: no tree found\n");
+        JNX_LOGF("Session get session: no tree found\n");
         return 0;
     }
-    JNX_LOGC("================Getting session [%s]===========\n",session_id);
+    JNX_LOGF("================Getting session [%s]===========\n",session_id);
     jnx_list *keys = jnx_list_create();
     jnx_btree_keys(session_tree,keys);
 
@@ -87,7 +87,7 @@ int session_get_session(char *session_id, session **session_handle) {
         if(strcmp(keys->head->_data,session_id) == 0) {
             session *s = jnx_btree_lookup(session_tree,keys->head->_data);
             if(s) {
-                JNX_LOGC("Found valid session %s\n",s->session_id);
+                JNX_LOGF("Found valid session %s\n",s->session_id);
                 *session_handle = s;
                 assert(*session_handle);
                 jnx_list_destroy(&keys);
@@ -101,7 +101,7 @@ int session_get_session(char *session_id, session **session_handle) {
 }
 char * session_create(raw_peer *local, raw_peer *foriegn) {
     if(!session_tree) {
-        JNX_LOGC("Session create: no tree found; making\n");
+        JNX_LOGF("Session create: no tree found; making\n");
         session_tree = jnx_btree_create(sizeof(int),session_tree_compare);
     }
     session *s = JNX_MEM_MALLOC(sizeof(session));
@@ -122,39 +122,39 @@ char * session_create(raw_peer *local, raw_peer *foriegn) {
 }
 void session_add(session *s) {
     if(!session_tree) {
-        JNX_LOGC("SESSION ADD: No tree found, making...\n");
+        JNX_LOGF("SESSION ADD: No tree found, making...\n");
         session_tree = jnx_btree_create(sizeof(int),session_tree_compare);
     }
     int n = session_count();
     jnx_btree_add(session_tree,s->session_id,s);
-    JNX_LOGC("==============Added to session tree [%s] Session Count %d============",s->session_id,session_count());
+    JNX_LOGF("==============Added to session tree [%s] Session Count %d============",s->session_id,session_count());
     assert(session_count() == (n+1));
 }
 void session_destroy(session *s) {
     assert(s);
     ///remove from the session tree
-    JNX_LOGC("Removing from session tree\n");
+    JNX_LOGF("Removing from session tree\n");
     jnx_btree_remove(session_tree,s->session_id,NULL,NULL);
-    JNX_LOGC("Deleting session id...\n");
+    JNX_LOGF("Deleting session id...\n");
     free(s->session_id);
     if(s->shared_secret) {
-        JNX_LOGC("Deleting session shared secret...\n");
+        JNX_LOGF("Deleting session shared secret...\n");
         free(s->shared_secret);
     }
     if(s->foriegn_public_key) {
-        JNX_LOGC("Deleting session foriegn public key...\n");
+        JNX_LOGF("Deleting session foriegn public key...\n");
         free(s->foriegn_public_key);
     }
     if(s->local_public_key) {
-        JNX_LOGC("Deleting session public key...\n");
+        JNX_LOGF("Deleting session public key...\n");
         free(s->local_public_key);
     }
-    JNX_LOGC("Deleting session object...\n");
+    JNX_LOGF("Deleting session object...\n");
     JNX_MEM_FREE(s);
 }
 int session_check_exists(raw_peer *local, raw_peer *foriegn) {
     if(!session_tree) {
-        JNX_LOGC("Session check exists : no tree found, making\n");
+        JNX_LOGF("Session check exists : no tree found, making\n");
         session_tree = jnx_btree_create(sizeof(int),session_tree_compare);
     }
     jnx_list *keys = jnx_list_create();
@@ -177,7 +177,7 @@ int session_check_exists(raw_peer *local, raw_peer *foriegn) {
 }
 int session_check_exists_by_id(char *session_id) {
     if(!session_tree) {
-        JNX_LOGC("BUILDING SESSION TREE\n");
+        JNX_LOGF("BUILDING SESSION TREE\n");
         session_tree = jnx_btree_create(sizeof(int),session_tree_compare);
         return 0;
     }
@@ -188,7 +188,7 @@ int session_check_exists_by_id(char *session_id) {
         if(strcmp(keys->head->_data,session_id) == 0) {
             session *s = jnx_btree_lookup(session_tree,keys->head->_data);
             if(s) {
-                JNX_LOGC("Found valid session %s\n",s->session_id);
+                JNX_LOGF("Found valid session %s\n",s->session_id);
                 jnx_list_destroy(&keys);
                 return 1;
             }
@@ -200,7 +200,7 @@ int session_check_exists_by_id(char *session_id) {
 }
 int session_count() {
     if(!session_tree) {
-        JNX_LOGC("session_count: no session tree\n");
+        JNX_LOGF("session_count: no session tree\n");
         return 0;
     }
     int n = 0;
