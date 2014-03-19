@@ -57,4 +57,5 @@ int session_check_exists(raw_peer *local, raw_peer *foriegn);
 int session_check_exists_by_id(char *session_id);
 
 int session_count();
+
 #endif

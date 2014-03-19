@@ -47,15 +47,14 @@ int passive_listener_callback(char *msg, size_t msg_len, char *ip) {
 		JNX_LOGC(">>>>>>>>>>>SESSION DOES NOT EXIST CREATING - %d ACTIVE SESSIONS...\n",session_count());
 			session_add(new_session);
     } else {
-		JNX_LOGC(">>>>>>>>>>FOUND EXISTING SESSSION\n");
+
+
 		session *old_session;
 		int ret = session_get_session(new_session->session_id,&old_session);
 		if(!ret) {
 			JNX_LOGC("Error getting old session :-(\n");
 			return 0;
 		}
-		JNX_LOGC(">>>>>>>>>UPDATING OLD SESSION\n");		
-		
 		assert(old_session->session_origin_guid);
 		assert(old_session->session_id);
 
@@ -63,6 +62,13 @@ int passive_listener_callback(char *msg, size_t msg_len, char *ip) {
 			new_session->local_keypair = old_session->local_keypair;
 		}
 		session_destroy(old_session);
+		/*
+		 * Nothing is retained from the old session, however the local_keypair 
+		 * is transferred to the local new session as it is not held or transmitted 
+		 * anywhere else
+		 */	
+		session_add(new_session);	
+		
 	}
     authentication_start_with_session(new_session);
 
