@@ -4,8 +4,6 @@ P2P decentralised chat program in early pre-Alpha
 
 Example - http://showterm.io/4bb6e10b6e4118e8e2a61#fast
 
-Video   - https://www.youtube.com/watch?v=jvTtCw8agVs
-
 Usage
 =====
 
