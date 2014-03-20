@@ -120,7 +120,7 @@ state authentication_start_with_session(session *s) {
             JNX_LOGF("Local peer connected with shared secret of %s\n",s->shared_secret);
 
             secure_channel_listener_resolve_with_session(s);
-        	jnx_term_printf_in_color(JNX_COL_BLUE,"Encrypted session established [%s]\n",s->session_id);
+            jnx_term_printf_in_color(JNX_COL_BLUE,"Encrypted session established [%s]\n",s->session_id);
         } else {
 
             char *shared_secret = s->shared_secret;
@@ -130,8 +130,10 @@ state authentication_start_with_session(session *s) {
             JNX_LOGF("Foriegn peer connected with shared secret of %s\n",s->shared_secret);
             secure_channel_listener_resolve_with_session(s);
             free(shared_secret);
-       		jnx_term_printf_in_color(JNX_COL_BLUE,"Incoming encrypted session [%s]\n",s->session_id);
-	   	}
+            jnx_term_printf_in_color(JNX_COL_BLUE,"Incoming encrypted session [%s]\n",s->session_id);
+
+
+        }
         break;
     }
     return s->current_state;

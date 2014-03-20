@@ -52,7 +52,6 @@ size_t secure_channel_send(session *s, char *message, size_t msg_len) {
 	
 	JNX_LOGF("encrypting \n%s\nwith %s\n",message,s->shared_secret);
 	char *buffer = des_encrypt(s->shared_secret,message,msg_len);
-
     if(strcmp(jnx_hash_get(configuration,"DEBUG"),"YES") == 0) {
         jnx_socket_tcp_send(sec,"localhost",s->foriegn_peer->secure_port,buffer,strlen(buffer));
     } else {
