@@ -17,8 +17,10 @@
  */
 #ifndef __SESSIONCONTROL_H__
 #define __SESSIONCONTROL_H__
+#include <jnxc_headers/jnxlist.h>
 #include "peerstore.h"
 typedef enum state {
+	SESSION_CLOSING,
 	SESSION_DORMANT,
 	SESSION_ERROR,
 	SESSION_PRE_HANDSHAKE, // <- all sessions start here
@@ -58,4 +60,7 @@ int session_check_exists_by_id(char *session_id);
 
 int session_count();
 
+jnx_list *session_get_connected_sessions();
+
+void session_shutdown(session *s);
 #endif

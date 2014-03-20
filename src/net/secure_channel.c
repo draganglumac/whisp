@@ -31,6 +31,7 @@ session *last_session = NULL;
 int secure_listener_callback(char *msg, size_t msg_len, char *ip) {
 
 	if(last_session) {
+		if(last_session->current_state == SESSION_CONNECTED) {
 		JNX_LOGF("Attempting to resolve message...\n");
 
 		JNX_LOGF("Decrypting with %s\n",last_session->shared_secret);
@@ -40,14 +41,18 @@ int secure_listener_callback(char *msg, size_t msg_len, char *ip) {
 		JNX_LOGF("decrypted message: %s\n",decrypted_message);
 		jnx_term_printf_in_color(JNX_COL_MAGENTA,">%s\n",decrypted_message);		
 		free(decrypted_message);
-		free(msg);
-
+		}
 	}
-	
+	free(msg);
+	///need to free ip?
 	return 0;
 }
 size_t secure_channel_send(session *s, char *message, size_t msg_len) {
-
+	
+	if(s->current_state != SESSION_CONNECTED) {
+		jnx_term_printf_in_color(JNX_COL_RED,"Unable to send message with session\n");
+		return -1;
+	}
 	jnx_socket *sec = jnx_socket_tcp_create(AF_INET);
 	
 	JNX_LOGF("encrypting \n%s\nwith %s\n",message,s->shared_secret);

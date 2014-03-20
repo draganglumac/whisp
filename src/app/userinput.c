@@ -38,6 +38,11 @@ void user_interact_session(char *session_id) {
     if(r) {
         jnx_term_printf_in_color(JNX_COL_CYAN,"Found session.\n");
         while(1) {
+
+			if(s->current_state != SESSION_CONNECTED) {
+				printf("Exiting from session mode\n");
+				return;
+			}
 			jnx_term_color(JNX_COL_YELLOW);
             char *line;
             size_t n;
@@ -74,7 +79,7 @@ void user_start_session(char *foriegn_peer_guid) {
                 assert(s->foriegn_peer == foriegn_peer);
 
                 //AUTHENTICATION ENTRY POINT [BLOCKING UI FROM FURTHER AUTHS]
-                authentication_start_with_session(s);
+                authentication_session_update(s);
 
             } else {
                 JNX_LOGF("An existing session was found!\n");

@@ -70,7 +70,7 @@ int passive_listener_callback(char *msg, size_t msg_len, char *ip) {
 		session_add(new_session);	
 		
 	}
-    authentication_start_with_session(new_session);
+    authentication_session_update(new_session);
 
     return is_not_exiting;
 }

@@ -210,3 +210,32 @@ int session_count() {
     jnx_list_destroy(&l);
     return n;
 }
+jnx_list *session_get_connected_sessions() {
+	if(!session_tree) {
+		return NULL;
+	}
+	jnx_list *l = jnx_list_create();
+	jnx_btree_keys(session_tree,l);
+	if(l->counter == 0) {
+		jnx_list_destroy(&l);
+		return NULL;
+	}
+	jnx_list *cl = jnx_list_create();
+	while(l->head) {
+		session *s = jnx_btree_lookup(session_tree,l->head->_data);
+		if(s->current_state == SESSION_CONNECTED) {
+			jnx_list_add(cl,s);
+		}
+		l->head = l->head->next_node;
+	}
+	return cl;
+}
+void session_shutdown(session *s) {
+	printf("Exiting session [%s]\n",s->session_id);
+	if(s->current_state != SESSION_CLOSING) {
+		s->current_state = SESSION_CLOSING;
+	}
+
+	//need to replicate this event on the other client
+	
+}

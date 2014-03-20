@@ -7,6 +7,10 @@ Example - http://showterm.io/4bb6e10b6e4118e8e2a61#fast
 Usage
 =====
 
+Set the conf/settings.conf to your prefered interface
+make
+./whisp
+
 Commands
 
 list  //Show guids of other chat clients nearby

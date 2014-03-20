@@ -20,6 +20,6 @@
 #include "sessioncontrol.h"
 #include <jnxc_headers/jnxhash.h>
 
-state authentication_start_with_session(session *s);
+state authentication_session_update(session *s);
 state authentication_get_progress(session *s);
 #endif

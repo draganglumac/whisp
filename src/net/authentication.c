@@ -43,7 +43,7 @@ void authentication_update_foriegn_session(session *s) {
     JNX_MEM_FREE(buffer);
     jnx_socket_destroy(&sec);
 }
-state authentication_start_with_session(session *s) {
+state authentication_session_update(session *s) {
     /*
      *
      * A ---> PREHANDSHAKE
@@ -108,7 +108,7 @@ state authentication_start_with_session(session *s) {
         JNX_LOGF("SESSION HANDSHAKING\n");
         ///IMPORTANT: Retain the plaintext shared secret
         s->shared_secret = shared_key;
-        authentication_start_with_session(s);
+        authentication_session_update(s);
         ///we dont need to keep the encyrpted shared_secret locally
         free(encrypted);
         break;
@@ -131,8 +131,6 @@ state authentication_start_with_session(session *s) {
             secure_channel_listener_resolve_with_session(s);
             free(shared_secret);
             jnx_term_printf_in_color(JNX_COL_BLUE,"Incoming encrypted session [%s]\n",s->session_id);
-
-
         }
         break;
     }
