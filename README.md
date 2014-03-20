@@ -2,6 +2,7 @@ whisp
 =====
 P2P decentralised chat program in early pre-Alpha
 
+Example - http://showterm.io/4bb6e10b6e4118e8e2a61#fast
 
 Usage
 =====
@@ -11,7 +12,7 @@ Commands
 list  //Show guids of other chat clients nearby
 convo //Initiate secure connection to a guid [ Pass guid ID as next input ]
 
-Once connection is established
+-- Once connection is established
 
 send //Will request to open the session for communication [ Pass session ID as next input ]
 
