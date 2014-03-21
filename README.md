@@ -25,10 +25,9 @@ send //Will request to open the session for communication [ Pass session ID as n
 Note
 =====
 
-- There are memory leaks where RSA keys are not cleaned
-- Multiple dangling pointers and other leaks where cleaning hasn't been done
-- Both clients MUST have each other on their peerstore lists before communicating
 
+- Both clients MUST have each other on their peerstore lists before communicating
+- No implementation of end-session or re-establish yet built
 
 
 Structure
