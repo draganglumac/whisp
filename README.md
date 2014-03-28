@@ -40,6 +40,6 @@ Structure
 	<--- TCP transmit public key
 	Generate asyemtrical shared secret---> Store shared secret
 	[ Switch to secure socket ]
-	<-Symmetrically encrypted messages>	
+	<-Symmetrically encrypted messages->	
 
 
