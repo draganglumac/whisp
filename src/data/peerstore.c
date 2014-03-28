@@ -137,9 +137,33 @@ void peerstore_delete_peer(raw_peer *rp) {
 	free(rp->port);
 	free(rp->secure_port);
 	free(rp->peerstring);
-	JNX_MEM_FREE(rp);	
-    jnx_thread_lock(&store_lock);
+	JNX_MEM_FREE(rp);
+	jnx_thread_lock(&store_lock);	
 	jnx_btree_remove(store,guid,NULL,NULL); ///is this correct usage???
-    jnx_thread_unlock(&store_lock);
+	jnx_thread_unlock(&store_lock);	
 	free(guid);
+}
+void peerstore_destroy() {
+	if(!store) { return; }
+    jnx_list *keys = jnx_list_create();
+	jnx_thread_lock(&store_lock);	
+    jnx_btree_keys(store,keys);
+	jnx_thread_unlock(&store_lock);	
+
+	while(keys->head) {
+		char *key = keys->head->_data;
+		jnx_thread_lock(&store_lock);	
+		raw_peer *r = jnx_btree_lookup(store,key);
+		jnx_thread_unlock(&store_lock);	
+		if(r) {
+			peerstore_delete_peer(r);
+		}else {
+			printf("Could not find peer for key %s\n",key);
+		}
+		keys->head = keys->head->next_node;
+	}	
+	jnx_list_destroy(&keys);
+	jnx_thread_lock(&store_lock);	
+	jnx_btree_destroy(store);
+	jnx_thread_unlock(&store_lock);	
 }

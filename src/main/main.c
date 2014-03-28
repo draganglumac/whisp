@@ -33,11 +33,11 @@ void signal_callback(int sig) {
 
     switch(sig) {
     case SIGINT:
-		jnx_term_printf_in_color(JNX_COL_CYAN,"Exiting active session(s)\n");
+		jnx_term_printf_in_color(JNX_COL_CYAN,"\tExiting active session(s)\n");
 		jnx_list *session_list = session_get_connected_sessions();
 		if(session_list) {
 			
-			jnx_term_printf_in_color(JNX_COL_CYAN,"Shutting down %d session(s)\n",
+			jnx_term_printf_in_color(JNX_COL_CYAN,"\tShutting down %d session(s)\n",
 					session_list->counter);
 		
 			while(session_list->head) {

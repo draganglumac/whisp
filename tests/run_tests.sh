@@ -15,7 +15,7 @@ function make_and_run() {
 
 function teardown() {
 	rm -rf build
-	rm runtests
+#	rm runtests
 }
 
 for f in tests/*/*.c

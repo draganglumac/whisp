@@ -231,11 +231,9 @@ jnx_list *session_get_connected_sessions() {
 	return cl;
 }
 void session_shutdown(session *s) {
-	printf("Exiting session [%s]\n",s->session_id);
 	if(s->current_state != SESSION_CLOSING) {
 		s->current_state = SESSION_CLOSING;
 	}
-
 	//need to replicate this event on the other client
 	
 }
