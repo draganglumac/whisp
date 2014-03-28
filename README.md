@@ -1,4 +1,4 @@
-whisp
+whisp ![Whisp Icon](http://jonesax.com/wp-content/uploads/2014/03/whispicon.png)
 =====
 P2P decentralised chat program in early pre-Alpha
 
