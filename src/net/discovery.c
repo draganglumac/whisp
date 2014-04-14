@@ -75,11 +75,11 @@ void *multicast_serialization_process(void *args) {
 ///////////////////////////
 
 ///////// THREAD TWO ///////
-int multicast_listener(uint8_t *msg, size_t len, char *ip) {
+int multicast_listener(uint8_t *msg, size_t len, jnx_socket *s) {
     thread_data *thr = JNX_MEM_MALLOC(sizeof(thread_data));
     thr->len = len;
     thr->msg = msg;
-    thr->ip = ip;
+    thr->ip = s->ipaddress;
     ASYNC_START(multicast_serialization_process,thr);
     return is_not_exiting;
 }

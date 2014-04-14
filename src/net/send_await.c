@@ -30,7 +30,7 @@ typedef struct thrdata {
 	tcp_socket_listener_callback c;
 }thrdata;
 static uint8_t *retval = NULL;
-int await_reply(uint8_t *msg, size_t len, char *ip) {
+int await_reply(uint8_t *msg, size_t len,jnx_socket *s) {
 
 	retval = msg;
 	return 1;

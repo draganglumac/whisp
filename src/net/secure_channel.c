@@ -28,7 +28,7 @@ static jnx_socket *secure_socket = NULL;
 static jnx_hashmap *configuration = NULL;
 session *last_session = NULL;
 
-int secure_listener_callback(uint8_t *msg, size_t msg_len, char *ip) {
+int secure_listener_callback(uint8_t *msg, size_t msg_len, jnx_socket *s) {
 
 	if(last_session) {
 		if(last_session->current_state == SESSION_CONNECTED) {

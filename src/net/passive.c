@@ -31,7 +31,7 @@ static int is_not_exiting = 0;
  * to establish a session on both ends
  * This is the foriegn peer route to authentication
  */
-int passive_listener_callback(uint8_t *msg, size_t msg_len, char *ip) {
+int passive_listener_callback(uint8_t *msg, size_t msg_len, jnx_socket *s) {
 
     //deserialise session
     session *new_session;
