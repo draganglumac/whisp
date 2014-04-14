@@ -1,4 +1,4 @@
-whisp
+whisp ![Whisp Icon](http://jonesax.com/wp-content/uploads/2014/03/whispicon.png)
 =====
 P2P decentralised chat program in early pre-Alpha
 
@@ -40,6 +40,6 @@ Structure
 	<--- TCP transmit public key
 	Generate asyemtrical shared secret---> Store shared secret
 	[ Switch to secure socket ]
-	<-Symmetrically encrypted messages>	
+	<-Symmetrically encrypted messages->	
 
 
