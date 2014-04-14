@@ -71,7 +71,7 @@ void user_start_session(char *foriegn_peer_guid) {
 
             if(!session_check_exists(local_peer,foriegn_peer)) {
                 char *session_handle  = session_create(local_peer,foriegn_peer);
-                JNX_LOGF("CREATING NEW SESSION %s\n",session_handle);
+                JNX_LOGF(JLOG_NORMAL,"CREATING NEW SESSION %s\n",session_handle);
                 session *s;
                 int ret = session_get_session(session_handle,&s);
                 assert(ret == 1);
@@ -82,7 +82,7 @@ void user_start_session(char *foriegn_peer_guid) {
                 authentication_session_update(s);
 
             } else {
-                JNX_LOGF("An existing session was found!\n");
+                JNX_LOGF(JLOG_NORMAL,"An existing session was found!\n");
             }
         }
     }

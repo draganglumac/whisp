@@ -22,6 +22,7 @@
 
 #define CONFIG_PATH "conf/settings.conf"
 
+char *generate_log();
 void print_welcome();
 
 void print_config(jnx_hashmap *config); 

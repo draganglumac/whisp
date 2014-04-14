@@ -20,6 +20,7 @@
 #include <signal.h>
 #include <jnxc_headers/jnxfile.h>
 #include <jnxc_headers/jnxlist.h>
+#include <jnxc_headers/jnxmem.h>
 #include <jnxc_headers/jnxlog.h>
 #include <jnxc_headers/jnxterm.h>
 #include <jnxc_headers/jnxthread.h>
@@ -31,76 +32,95 @@
 extern jnx_hashmap *configuration;
 void signal_callback(int sig) {
 
-    switch(sig) {
-    case SIGINT:
-		jnx_term_printf_in_color(JNX_COL_CYAN,"\tExiting active session(s)\n");
-		jnx_list *session_list = session_get_connected_sessions();
-		if(session_list) {
-			
-			jnx_term_printf_in_color(JNX_COL_CYAN,"\tShutting down %d session(s)\n",
-					session_list->counter);
-		
-			while(session_list->head) {
-				session *s = session_list->head->_data;
-				session_shutdown(s);
-				session_list->head = session_list->head->next_node;
-			}	
-			jnx_list_destroy(&session_list);
-		}	
-        break;
+	switch(sig) {
+		case SIGINT:
+			jnx_term_printf_in_color(JNX_COL_CYAN,"\tExiting active session(s)\n");
+			jnx_list *session_list = session_get_connected_sessions();
+			if(session_list) {
 
-    case SIGKILL:
-        jnx_mem_print_to_file("logs/mem.file");
-        JNX_LOGC("Tearing down discovery...\n");
-        discovery_teardown();
-        JNX_LOGC("Stopping passive listener...\n");
-        passive_listener_stop();
-        JNX_LOGC("Destroying hashmap...\n");
-        jnx_hash_destroy(configuration);
-        exit(0);
-        break;
-    }
+				jnx_term_printf_in_color(JNX_COL_CYAN,"\tShutting down %d session(s)\n",
+						session_list->counter);
+
+				while(session_list->head) {
+					session *s = session_list->head->_data;
+					session_shutdown(s);
+					session_list->head = session_list->head->next_node;
+				}	
+				jnx_list_destroy(&session_list);
+			}	
+			break;
+
+		case SIGKILL:
+			jnx_mem_print_to_file("logs/mem.file");
+			JNX_LOGC(JLOG_NORMAL,"Tearing down discovery...\n");
+			discovery_teardown();
+			JNX_LOGC(JLOG_NORMAL,"Stopping passive listener...\n");
+			passive_listener_stop();
+			JNX_LOGC(JLOG_NORMAL,"Destroying hashmap...\n");
+			jnx_hash_destroy(configuration);
+			jnx_mem_print();
+			exit(0);
+			break;
+	}
+}
+char *generate_log_path() {
+	char buffer[2048];
+	bzero(buffer,2048);
+
+	char *path;
+	jnx_file_mktempdir("/tmp",&path);
+	if(path == NULL) {
+		printf("Error creating temporary directory!\n");
+			return NULL;
+	}
+	sprintf(buffer,"%s.log",path);
+	free(path);
+	return strdup(buffer);
 }
 int main(int argc, char **argv) {
 
-    signal(SIGKILL,signal_callback);
-    signal(SIGINT,signal_callback);
-    signal(SIGTERM,signal_callback);
-    jnx_log_file_setup("logs/current.log");
-    jnx_hashmap *configuration = jnx_file_read_kvp(CONFIG_PATH, 1024, "=");
+	signal(SIGKILL,signal_callback);
+	signal(SIGINT,signal_callback);
+	signal(SIGTERM,signal_callback);
 
-    assert(configuration);
+	char *path = generate_log_path();
+	jnx_log_set_path(path);
+
+	jnx_hashmap *configuration = jnx_file_read_kvp(CONFIG_PATH, 1024, "=");
+
+	assert(configuration);
 
     print_welcome();
-    //    print_config(configuration);
+	//    print_config(configuration);
 
-    resolve_interface_address(configuration);
+	resolve_interface_address(configuration);
 
-    generate_ports(configuration);
+	generate_ports(configuration);
 
-    generate_guid(configuration);
+	generate_guid(configuration);
 
-    discovery_setup(configuration);
+	discovery_setup(configuration);
 
-    passive_listener_setup(configuration);
+	passive_listener_setup(configuration);
 
-    secure_channel_setup(configuration);
+	secure_channel_setup(configuration);
 
-    serialiser_setup(configuration);
+	serialiser_setup(configuration);
 
-    // Calling it here before we use any of the OpenSSL API calls
-    global_initialise_openSSL();
+	// Calling it here before we use any of the OpenSSL API calls
+	global_initialise_openSSL();
 
-    jnx_thread_create_disposable(discovery_start,NULL);
+	jnx_thread_create_disposable(discovery_start,NULL);
 
-    user_input_loop();
+	user_input_loop();
 
-    // Cleaning up OpenSSL infrastructure for the process before return.
-    global_cleanup_openSSL();
+	// Cleaning up OpenSSL infrastructure for the process before return.
+	global_cleanup_openSSL();
 
-    jnx_hash_destroy(configuration);
+	jnx_hash_destroy(configuration);
 
-    return 0;
+	free(path);
+	return 0;
 }
 
 

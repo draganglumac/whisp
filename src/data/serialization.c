@@ -81,7 +81,7 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
                 return S_MALFORMED;
             }
             (*outpeer)->guid = strdup(value);
-            //     JNX_LOGC("GUID KEY %s with value %s\n",t,(*outpeer)->guid);
+            //     JNX_LOGC(JLOG_NORMAL,"GUID KEY %s with value %s\n",t,(*outpeer)->guid);
         }
         if(strcmp(t, COMMAND_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
@@ -92,7 +92,7 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
                 return S_MALFORMED;
             }
             (*outpeer)->command = strdup(value);
-            //        JNX_LOGC("COMMAND KEY %s with value %s\n",t,(*outpeer)->command);
+            //        JNX_LOGC(JLOG_NORMAL,"COMMAND KEY %s with value %s\n",t,(*outpeer)->command);
         }
         if(strcmp(t, PORT_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
@@ -104,7 +104,7 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
                 return S_MALFORMED;
             }
             (*outpeer)->port = strdup(value);
-            //          JNX_LOGC("PORT KEY %s with value %s\n",t,(*outpeer)->port);
+            //          JNX_LOGC(JLOG_NORMAL,"PORT KEY %s with value %s\n",t,(*outpeer)->port);
         }
         if(strcmp(t,SECUREPORT_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
@@ -117,7 +117,7 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
                 return S_MALFORMED;
             }
             (*outpeer)->secure_port = strdup(value);
-//            JNX_LOGC("SECUREPORT KEY %s with value %s\n",t,(*outpeer)->secure_port);
+//            JNX_LOGC(JLOG_NORMAL,"SECUREPORT KEY %s with value %s\n",t,(*outpeer)->secure_port);
         }
         if(strcmp(t,PEERAGE_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
@@ -130,7 +130,7 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
                 return S_MALFORMED;
             }
             (*outpeer)->peerstring = strdup(value);
-//            JNX_LOGC("PEER KEY %s with value %s\n",t,(*outpeer)->peerstring);
+//            JNX_LOGC(JLOG_NORMAL,"PEER KEY %s with value %s\n",t,(*outpeer)->peerstring);
         }
         (*outpeer)->ip = interface_ip;
 
@@ -158,16 +158,16 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
                 if(peerstore_check_peer(value,&local_peer)) {
                     (*s)->local_peer = local_peer;
                 } else {
-                    JNX_LOGF("Error retrieving local peer deserialisation data\n");
+                    JNX_LOGF(JLOG_NORMAL,"Error retrieving local peer deserialisation data\n");
                 }
 
             } else {
-                JNX_LOGF("Recieved session being deserialised holds a local peer that is not own,swapping out to foriegn peer\n");
+                JNX_LOGF(JLOG_NORMAL,"Recieved session being deserialised holds a local peer that is not own,swapping out to foriegn peer\n");
                 raw_peer *foriegn_peer;
                 if(peerstore_check_peer(value,&foriegn_peer)) {
                     (*s)->foriegn_peer = foriegn_peer;
                 } else {
-                    JNX_LOGF("Error retrieving local copy of foriegn peer!\n");
+                    JNX_LOGF(JLOG_NORMAL,"Error retrieving local copy of foriegn peer!\n");
                 }
 
             }
@@ -184,14 +184,14 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
                 if(peerstore_check_peer(value,&local_peer)) {
                     (*s)->local_peer = local_peer;
                 } else {
-                    JNX_LOGF("Error retrieving local peer deserialisation data\n");
+                    JNX_LOGF(JLOG_NORMAL,"Error retrieving local peer deserialisation data\n");
                 }
             } else {
                 raw_peer *foriegn_peer;
                 if(peerstore_check_peer(value,&foriegn_peer)) {
                     (*s)->foriegn_peer = foriegn_peer;
                 } else {
-                    JNX_LOGF("Error retrieving local copy of foriegn peer!\n");
+                    JNX_LOGF(JLOG_NORMAL,"Error retrieving local copy of foriegn peer!\n");
                 }
             }
         }

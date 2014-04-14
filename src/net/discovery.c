@@ -46,13 +46,13 @@ void *multicast_serialization_process(void *args) {
 	jnx_mem_free(p);
     switch(ret) {
     case S_MALFORMED:
-        JNX_LOGC("malformed deserialization data...\n");
+        JNX_LOGC(JLOG_NORMAL,"malformed deserialization data...\n");
         break;
     case S_GENERAL_ERROR:
-        JNX_LOGC("general error deserializing...\n");
+        JNX_LOGC(JLOG_NORMAL,"general error deserializing...\n");
         break;
     case S_UNKNOWN:
-        JNX_LOGC("unknown error deserializing...\n");
+        JNX_LOGC(JLOG_NORMAL,"unknown error deserializing...\n");
         break;
     case S_OKAY:
         assert(rp);
@@ -75,7 +75,7 @@ void *multicast_serialization_process(void *args) {
 ///////////////////////////
 
 ///////// THREAD TWO ///////
-int multicast_listener(char *msg, size_t len, char *ip) {
+int multicast_listener(uint8_t *msg, size_t len, char *ip) {
     thread_data *thr = JNX_MEM_MALLOC(sizeof(thread_data));
     thr->len = len;
     thr->msg = msg;
