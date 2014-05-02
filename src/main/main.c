@@ -29,6 +29,7 @@
 #include "secure_channel.h"
 #include "userinput.h"
 #include "discovery.h"
+#include "ipc.h"
 extern jnx_hashmap *configuration;
 void signal_callback(int sig) {
 
@@ -49,16 +50,15 @@ void signal_callback(int sig) {
 				jnx_list_destroy(&session_list);
 			}	
 			break;
-
-		case SIGKILL:
-			jnx_mem_print_to_file("logs/mem.file");
-			JNX_LOGC(JLOG_NORMAL,"Tearing down discovery...\n");
+		default:
+			JNX_LOGC(JLOG_CRITICAL,"Tearing down discovery...\n");
 			discovery_teardown();
-			JNX_LOGC(JLOG_NORMAL,"Stopping passive listener...\n");
+			JNX_LOGC(JLOG_CRITICAL,"Stopping passive listener...\n");
 			passive_listener_stop();
-			JNX_LOGC(JLOG_NORMAL,"Destroying hashmap...\n");
+			JNX_LOGC(JLOG_CRITICAL,"Killing ipc listener...\n");
+			ipc_teardown();	
+			JNX_LOGC(JLOG_CRITICAL,"Destroying hashmap...\n");
 			jnx_hash_destroy(configuration);
-			jnx_mem_print();
 			exit(0);
 			break;
 	}
@@ -83,8 +83,6 @@ int main(int argc, char **argv) {
 	signal(SIGINT,signal_callback);
 	signal(SIGTERM,signal_callback);
 
-	char *path = generate_log_path();
-	jnx_log_set_path(path);
 
 	jnx_hashmap *configuration = jnx_file_read_kvp(CONFIG_PATH, 1024, "=");
 
@@ -98,6 +96,8 @@ int main(int argc, char **argv) {
 	generate_ports(configuration);
 
 	generate_guid(configuration);
+
+	ipc_setup(configuration);
 
 	discovery_setup(configuration);
 
@@ -119,7 +119,6 @@ int main(int argc, char **argv) {
 
 	jnx_hash_destroy(configuration);
 
-	free(path);
 	return 0;
 }
 

@@ -43,7 +43,7 @@ void *multicast_serialization_process(void *args) {
     thread_data *p = (thread_data*)args;
     raw_peer *rp = NULL;
     S_TYPES ret = deserialize_data(&rp,p->msg,p->len,p->ip);
-	jnx_mem_free(p);
+	free(p);
     switch(ret) {
     case S_MALFORMED:
         JNX_LOGC(JLOG_NORMAL,"malformed deserialization data...\n");
@@ -79,8 +79,10 @@ int multicast_listener(uint8_t *msg, size_t len, jnx_socket *s) {
     thread_data *thr = JNX_MEM_MALLOC(sizeof(thread_data));
     thr->len = len;
     thr->msg = msg;
-    thr->ip = s->ipaddress;
-    ASYNC_START(multicast_serialization_process,thr);
+	assert(s->ipaddress);
+	thr->ip = s->ipaddress;
+ 
+	ASYNC_START(multicast_serialization_process,thr);
     return is_not_exiting;
 }
 void *multicast_listen_start(void *args) {
