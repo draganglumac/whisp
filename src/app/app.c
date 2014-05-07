@@ -53,7 +53,7 @@ void resolve_interface_address(jnx_hashmap *config) {
 	if (strcmp(af, "AF_INET6") == 0) {
 		family = AF_INET6;
 	}
-	char *ip = jnx_network_get_ip(interface, family);
+	char *ip = jnx_network_interface_to_string(interface, family);
 	assert(ip);
 	printf("Local IP %s for interface %s addressfamily %s\n", ip, interface, af);
 	jnx_hash_put(config, "IP", ip);
