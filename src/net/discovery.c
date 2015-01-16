@@ -20,6 +20,7 @@
 #include <jnxc_headers/jnxthread.h>
 #include <jnxc_headers/jnxsocket.h>
 #include <jnxc_headers/jnxlog.h>
+#include <jnxc_headers/jnxcheck.h>
 #include "discovery.h"
 #include "serialization.h"
 #include "peerstore.h"
@@ -54,11 +55,11 @@ void *multicast_serialization_process(void *args) {
         JNX_LOG(DEFAULT_CONTEXT,"unknown error deserializing...\n");
         break;
     case S_OKAY:
-        assert(rp);
-        assert(rp->guid);
-        assert(rp->command);
-        assert(rp->ip);
-        assert(rp->port);
+        JNXCHECK(rp);
+        JNXCHECK(rp->guid);
+        JNXCHECK(rp->command);
+        JNXCHECK(rp->ip);
+        JNXCHECK(rp->port);
         raw_peer *handle;
         if(peerstore_check_peer(rp->guid,&handle) == 0) {
             peerstore_add_peer(rp);
@@ -78,7 +79,7 @@ int multicast_listener(uint8_t *msg, size_t len, jnx_socket *s) {
     thread_data *thr = malloc(sizeof(thread_data));
     thr->len = len;
     thr->msg = msg;
-	assert(s->ipaddress);
+	JNXCHECK(s->ipaddress);
 	thr->ip = s->ipaddress;
  
 	ASYNC_START(multicast_serialization_process,thr);
@@ -104,7 +105,7 @@ void *multicast_pulse(void *args) {
 ///////////////////////////
 void discovery_setup(jnx_hashmap *config) {
     configuration = config;
-    assert(configuration);
+    JNXCHECK(configuration);
 
     char *af = jnx_hash_get(configuration,"ADDFAMILY");
     unsigned int family = AF_INET;
@@ -112,15 +113,15 @@ void discovery_setup(jnx_hashmap *config) {
         family = AF_INET6;
     }
     char *bgroup = jnx_hash_get(configuration,"BGROUP");
-    assert(bgroup);
+    JNXCHECK(bgroup);
     char *bport = jnx_hash_get(configuration,"BPORT");
-    assert(bport);
+    JNXCHECK(bport);
     char *tport = jnx_hash_get(configuration,"TPORT");
-    assert(tport);
+    JNXCHECK(tport);
     char *ip = jnx_hash_get(configuration,"IP");
-    assert(ip);
+    JNXCHECK(ip);
     int cinterval = atoi(jnx_hash_get(configuration,"INTERVAL"));
-    assert(cinterval);
+    JNXCHECK(cinterval);
     interval = cinterval;
 
     multicast_pulse_out = jnx_socket_udp_create(family);

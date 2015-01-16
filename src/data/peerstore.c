@@ -20,6 +20,7 @@
 #include <jnxc_headers/jnxlist.h>
 #include <jnxc_headers/jnxlog.h>
 #include <jnxc_headers/jnxterm.h>
+#include <jnxc_headers/jnxcheck.h>
 #include <jnxc_headers/jnxhash.h>
 #include <jnxc_headers/jnxthread.h>
 #include <unistd.h>
@@ -115,7 +116,7 @@ int peerstore_add_peer(raw_peer *rp) {
     return 0;
 }
 void peerstore_update_peer(raw_peer *new_peer,raw_peer *updated_peer) {
-	assert(strcmp(new_peer->guid,updated_peer->guid) == 0);
+	JNXCHECK(strcmp(new_peer->guid,updated_peer->guid) == 0);
 
 	free(updated_peer->command);
 	updated_peer->command = new_peer->command;

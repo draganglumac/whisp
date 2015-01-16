@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <jnxc_headers/jnxlog.h>
 #include <jnxc_headers/jnxterm.h>
+#include <jnxc_headers/jnxcheck.h>
 #include <jnxc_headers/jnxsocket.h>
 #include "secure_channel.h"
 #include "des.h"
@@ -80,7 +81,7 @@ void secure_channel_setup(jnx_hashmap *config) {
 	JNX_LOG(DEFAULT_CONTEXT,"Starting secure socket channel...\n");
 	configuration = config;
 	char *sport = jnx_hash_get(configuration,"SECUREPORT");
-	assert(sport);
+	JNXCHECK(sport);
 	secure_socket = jnx_socket_tcp_create(AF_INET);
 	ASYNC_START(secure_listener_start,sport);
 }

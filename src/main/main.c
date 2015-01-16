@@ -23,6 +23,7 @@
 #include <jnxc_headers/jnxlog.h>
 #include <jnxc_headers/jnxterm.h>
 #include <jnxc_headers/jnxthread.h>
+#include <jnxc_headers/jnxcheck.h>
 #include "local_macro.h"
 #include "app.h"
 #include "secure_channel.h"
@@ -85,7 +86,7 @@ int main(int argc, char **argv) {
 
 	jnx_hashmap *configuration = jnx_file_read_kvp(CONFIG_PATH, 1024, "=");
 
-	assert(configuration);
+	JNXCHECK(configuration);
 
     print_welcome();
 	//    print_config(configuration);
