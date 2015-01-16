@@ -20,7 +20,6 @@
 #include <signal.h>
 #include <jnxc_headers/jnxfile.h>
 #include <jnxc_headers/jnxlist.h>
-#include <jnxc_headers/jnxmem.h>
 #include <jnxc_headers/jnxlog.h>
 #include <jnxc_headers/jnxterm.h>
 #include <jnxc_headers/jnxthread.h>
@@ -51,14 +50,14 @@ void signal_callback(int sig) {
 			}	
 			break;
 		default:
-			JNX_LOGC(JLOG_CRITICAL,"Tearing down discovery...\n");
+			JNX_LOG(DEFAULT_CONTEXT,"Tearing down discovery...\n");
 			discovery_teardown();
-			JNX_LOGC(JLOG_CRITICAL,"Stopping passive listener...\n");
+			JNX_LOG(DEFAULT_CONTEXT,"Stopping passive listener...\n");
 			passive_listener_stop();
-			JNX_LOGC(JLOG_CRITICAL,"Killing ipc listener...\n");
+			JNX_LOG(DEFAULT_CONTEXT,"Killing ipc listener...\n");
 			ipc_teardown();	
-			JNX_LOGC(JLOG_CRITICAL,"Destroying hashmap...\n");
-			jnx_hash_destroy(configuration);
+			JNX_LOG(DEFAULT_CONTEXT,"Destroying hashmap...\n");
+			jnx_hash_destroy(&configuration);
 			exit(0);
 			break;
 	}
@@ -117,7 +116,7 @@ int main(int argc, char **argv) {
 	// Cleaning up OpenSSL infrastructure for the process before return.
 	global_cleanup_openSSL();
 
-	jnx_hash_destroy(configuration);
+	jnx_hash_destroy(&configuration);
 
 	return 0;
 }

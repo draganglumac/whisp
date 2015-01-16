@@ -15,10 +15,10 @@
  *
  * =====================================================================================
  */
-#include <jnxc_headers/jnxmem.h>
 #include <jnxc_headers/jnxlog.h>
 #include <jnxc_headers/jnxthread.h>
 #include <jnxc_headers/jnxhash.h>
+#include <jnxc_headers/jnxcheck.h>
 #include <stdlib.h>
 #include "serialization.h"
 #include "peerstore.h"
@@ -45,7 +45,7 @@ static char* guid_string = NULL;
 void serialiser_setup(jnx_hashmap *configuration) {
     if(!guid_string) {
         guid_string = jnx_hash_get(configuration,"GUID");
-        assert(guid_string);
+        JNXCHECK(guid_string);
     }
 }
 size_t serialize_data(char **outbuffer,char *guid,char *command,char *port, char *secure_port,char *peerage) {
@@ -55,9 +55,9 @@ size_t serialize_data(char **outbuffer,char *guid,char *command,char *port, char
     const char *data_frame = "GUID:%s:COMMAND:%s:TPORT:%s:SECUREPORT:%s:PEERAGE:%s:";
     sprintf(buffer,data_frame,guid,command,port,secure_port,peerage);
     s = strlen(buffer);
-    *outbuffer = JNX_MEM_CALLOC(s,sizeof(char));
+    *outbuffer = calloc(s,sizeof(char));
     memcpy(*outbuffer,buffer,s);
-    assert(s != 0);
+    JNXCHECK(s != 0);
     return s;
 
 }
@@ -71,66 +71,66 @@ S_TYPES deserialize_data(raw_peer **outpeer, char *raw_message, size_t raw_messa
     if(t == NULL) {
         return S_UNKNOWN;
     }
-    *outpeer = JNX_MEM_MALLOC(sizeof(raw_peer));
+    *outpeer = malloc(sizeof(raw_peer));
     while(t != NULL) {
         if(strcmp(t,GUID_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
-                JNX_MEM_FREE(*outpeer);
+                free(*outpeer);
                 *outpeer = NULL;
                 return S_MALFORMED;
             }
             (*outpeer)->guid = strdup(value);
-            //     JNX_LOGC(JLOG_NORMAL,"GUID KEY %s with value %s\n",t,(*outpeer)->guid);
+            //     JNX_LOG(DEFAULT_CONTEXT,"GUID KEY %s with value %s\n",t,(*outpeer)->guid);
         }
         if(strcmp(t, COMMAND_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
-                JNX_MEM_FREE((*outpeer)->guid);
-                JNX_MEM_FREE(*outpeer);
+                free((*outpeer)->guid);
+                free(*outpeer);
                 *outpeer = NULL;
                 return S_MALFORMED;
             }
             (*outpeer)->command = strdup(value);
-            //        JNX_LOGC(JLOG_NORMAL,"COMMAND KEY %s with value %s\n",t,(*outpeer)->command);
+            //        JNX_LOG(DEFAULT_CONTEXT,"COMMAND KEY %s with value %s\n",t,(*outpeer)->command);
         }
         if(strcmp(t, PORT_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
-                JNX_MEM_FREE((*outpeer)->guid);
-                JNX_MEM_FREE((*outpeer)->command);
-                JNX_MEM_FREE(*outpeer);
+                free((*outpeer)->guid);
+                free((*outpeer)->command);
+                free(*outpeer);
                 *outpeer = NULL;
                 return S_MALFORMED;
             }
             (*outpeer)->port = strdup(value);
-            //          JNX_LOGC(JLOG_NORMAL,"PORT KEY %s with value %s\n",t,(*outpeer)->port);
+            //          JNX_LOG(DEFAULT_CONTEXT,"PORT KEY %s with value %s\n",t,(*outpeer)->port);
         }
         if(strcmp(t,SECUREPORT_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
-                JNX_MEM_FREE((*outpeer)->guid);
-                JNX_MEM_FREE((*outpeer)->command);
-                JNX_MEM_FREE((*outpeer)->port);
-                JNX_MEM_FREE(*outpeer);
+                free((*outpeer)->guid);
+                free((*outpeer)->command);
+                free((*outpeer)->port);
+                free(*outpeer);
                 *outpeer = NULL;
                 return S_MALFORMED;
             }
             (*outpeer)->secure_port = strdup(value);
-//            JNX_LOGC(JLOG_NORMAL,"SECUREPORT KEY %s with value %s\n",t,(*outpeer)->secure_port);
+//            JNX_LOG(DEFAULT_CONTEXT,"SECUREPORT KEY %s with value %s\n",t,(*outpeer)->secure_port);
         }
         if(strcmp(t,PEERAGE_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
-                JNX_MEM_FREE((*outpeer)->guid);
-                JNX_MEM_FREE((*outpeer)->command);
-                JNX_MEM_FREE((*outpeer)->port);
-                JNX_MEM_FREE(*outpeer);
+                free((*outpeer)->guid);
+                free((*outpeer)->command);
+                free((*outpeer)->port);
+                free(*outpeer);
                 *outpeer = NULL;
                 return S_MALFORMED;
             }
             (*outpeer)->peerstring = strdup(value);
-//            JNX_LOGC(JLOG_NORMAL,"PEER KEY %s with value %s\n",t,(*outpeer)->peerstring);
+//            JNX_LOG(DEFAULT_CONTEXT,"PEER KEY %s with value %s\n",t,(*outpeer)->peerstring);
         }
         (*outpeer)->ip = interface_ip;
 
@@ -144,12 +144,12 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
     }
     char *saveptr = NULL;
     char *t = strtok_r(raw_message,DELIMITER,&saveptr);
-    *s = JNX_MEM_MALLOC(sizeof(session));
+    *s = malloc(sizeof(session));
     while(t != NULL) {
         if(strcmp(t,LOCAL_PEER_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
-                JNX_MEM_FREE(*s);
+                free(*s);
                 *s = NULL;
                 return S_MALFORMED;
             }
@@ -158,16 +158,16 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
                 if(peerstore_check_peer(value,&local_peer)) {
                     (*s)->local_peer = local_peer;
                 } else {
-                    JNX_LOGC(JLOG_NORMAL,"Error retrieving local peer deserialisation data\n");
+                    JNX_LOG(DEFAULT_CONTEXT,"Error retrieving local peer deserialisation data\n");
                 }
 
             } else {
-                JNX_LOGC(JLOG_NORMAL,"Recieved session being deserialised holds a local peer that is not own,swapping out to foriegn peer\n");
+                JNX_LOG(DEFAULT_CONTEXT,"Recieved session being deserialised holds a local peer that is not own,swapping out to foriegn peer\n");
                 raw_peer *foriegn_peer;
                 if(peerstore_check_peer(value,&foriegn_peer)) {
                     (*s)->foriegn_peer = foriegn_peer;
                 } else {
-                    JNX_LOGC(JLOG_NORMAL,"Error retrieving local copy of foriegn peer!\n");
+                    JNX_LOG(DEFAULT_CONTEXT,"Error retrieving local copy of foriegn peer!\n");
                 }
 
             }
@@ -175,7 +175,7 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
         if(strcmp(t,FORIEGN_PEER_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
-                JNX_MEM_FREE(*s);
+                free(*s);
                 *s = NULL;
                 return S_MALFORMED;
             }
@@ -184,21 +184,21 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
                 if(peerstore_check_peer(value,&local_peer)) {
                     (*s)->local_peer = local_peer;
                 } else {
-                    JNX_LOGC(JLOG_NORMAL,"Error retrieving local peer deserialisation data\n");
+                    JNX_LOG(DEFAULT_CONTEXT,"Error retrieving local peer deserialisation data\n");
                 }
             } else {
                 raw_peer *foriegn_peer;
                 if(peerstore_check_peer(value,&foriegn_peer)) {
                     (*s)->foriegn_peer = foriegn_peer;
                 } else {
-                    JNX_LOGC(JLOG_NORMAL,"Error retrieving local copy of foriegn peer!\n");
+                    JNX_LOG(DEFAULT_CONTEXT,"Error retrieving local copy of foriegn peer!\n");
                 }
             }
         }
         if(strcmp(t,SHARED_SECRET_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
-                JNX_MEM_FREE(*s);
+                free(*s);
                 *s = NULL;
                 return S_MALFORMED;
             }
@@ -211,8 +211,8 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
         if(strcmp(t,SESSION_ID_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
-                JNX_MEM_FREE((*s)->shared_secret);
-                JNX_MEM_FREE(*s);
+                free((*s)->shared_secret);
+                free(*s);
                 *s = NULL;
                 return S_MALFORMED;
             }
@@ -221,9 +221,9 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
         if(strcmp(t,SESSION_ORIGIN_GUID_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
-                JNX_MEM_FREE((*s)->shared_secret);
-                JNX_MEM_FREE((*s)->session_id);
-                JNX_MEM_FREE(*s);
+                free((*s)->shared_secret);
+                free((*s)->session_id);
+                free(*s);
                 *s = NULL;
                 return S_MALFORMED;
             }
@@ -232,10 +232,10 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
 		if(strcmp(t,LOCAL_PUBLIC_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
-                JNX_MEM_FREE((*s)->shared_secret);
-                JNX_MEM_FREE((*s)->session_id);
-                JNX_MEM_FREE(*s);
-            	JNX_MEM_FREE((*s)->session_origin_guid);
+                free((*s)->shared_secret);
+                free((*s)->session_id);
+                free(*s);
+            	free((*s)->session_origin_guid);
 				*s = NULL;
 				return S_MALFORMED;
 			}
@@ -244,11 +244,11 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
 		if(strcmp(t,FORIEGN_PUBLIC_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
-                JNX_MEM_FREE((*s)->shared_secret);
-                JNX_MEM_FREE((*s)->session_id);
-                JNX_MEM_FREE(*s);
-            	JNX_MEM_FREE((*s)->session_origin_guid);
-				JNX_MEM_FREE((*s)->local_public_key);
+                free((*s)->shared_secret);
+                free((*s)->session_id);
+                free(*s);
+            	free((*s)->session_origin_guid);
+				free((*s)->local_public_key);
 				*s = NULL;
 				return S_MALFORMED;
 			}
@@ -257,12 +257,12 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
 		if(strcmp(t,SHARED_SECRET_LEN_KEY) == 0) {
             char *value = strtok_r(NULL,DELIMITER,&saveptr);
             if(value == NULL) {
-                JNX_MEM_FREE((*s)->shared_secret);
-                JNX_MEM_FREE((*s)->session_id);
-                JNX_MEM_FREE(*s);
-            	JNX_MEM_FREE((*s)->session_origin_guid);
-				JNX_MEM_FREE((*s)->local_public_key);
-				JNX_MEM_FREE((*s)->foriegn_public_key);
+                free((*s)->shared_secret);
+                free((*s)->session_id);
+                free(*s);
+            	free((*s)->session_origin_guid);
+				free((*s)->local_public_key);
+				free((*s)->foriegn_public_key);
 				*s = NULL;
 				return S_MALFORMED;
 			}
@@ -276,7 +276,7 @@ S_TYPES deserialize_session_data(session **s,char *raw_message, size_t raw_messa
 
 size_t serialize_session_data(char **outbuffer,session *s) {
     size_t len = 0;
-    char *buffer = JNX_MEM_MALLOC(sizeof(char) * 6000);
+    char *buffer = malloc(sizeof(char) * 6000);
     const char *session_frame = "LOCAL_PEER:%s:FORIEGN_PEER:%s:SHARED_SECRET:%s:CURRENT_STATE:%d:SESSION_ID:%s:SESSION_ORIGIN_GUID:%s:LOCAL_PUBLIC_KEY:%s:FORIEGN_PUBLIC_KEY:%s:SHARED_SECRET_LEN:%d:";
 
     len = sprintf(buffer,session_frame,s->local_peer->guid,s->foriegn_peer->guid,

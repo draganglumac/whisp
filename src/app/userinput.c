@@ -21,7 +21,7 @@
 #include "discovery.h"
 #include "peerstore.h"
 #include "sessioncontrol.h"
-#include <jnxc_headers/jnxmem.h>
+#include <jnxc_headers/jnxcheck.h>
 #include <jnxc_headers/jnxterm.h>
 #include <jnxc_headers/jnxlog.h>
 extern jnx_hashmap *configuration;
@@ -50,11 +50,11 @@ void user_interact_session(char *session_id) {
             }
 			jnx_term_default();
             trim(line);
-        	char *outmsg = JNX_MEM_MALLOC(sizeof(char) * strlen(line) +1);
+        	char *outmsg = malloc(sizeof(char) * strlen(line) +1);
 			bzero(outmsg,strlen(line) +1);
 			memcpy(outmsg,line,strlen(line));
 			secure_channel_send(s,outmsg,strlen(line) +1);
-			JNX_MEM_FREE(outmsg);
+			free(outmsg);
 		}
 
     } else {
@@ -71,18 +71,18 @@ void user_start_session(char *foriegn_peer_guid) {
 
             if(!session_check_exists(local_peer,foriegn_peer)) {
                 char *session_handle  = session_create(local_peer,foriegn_peer);
-                JNX_LOGC(JLOG_NORMAL,"CREATING NEW SESSION %s\n",session_handle);
+                JNX_LOG(DEFAULT_CONTEXT,"CREATING NEW SESSION %s\n",session_handle);
                 session *s;
                 int ret = session_get_session(session_handle,&s);
-                assert(ret == 1);
-                assert(s->local_peer == local_peer);
-                assert(s->foriegn_peer == foriegn_peer);
+                JNXCHECK(ret == 1);
+                JNXCHECK(s->local_peer == local_peer);
+                JNXCHECK(s->foriegn_peer == foriegn_peer);
 
                 //AUTHENTICATION ENTRY POINT [BLOCKING UI FROM FURTHER AUTHS]
                 authentication_session_update(s);
 
             } else {
-                JNX_LOGC(JLOG_NORMAL,"An existing session was found!\n");
+                JNX_LOG(DEFAULT_CONTEXT,"An existing session was found!\n");
             }
         }
     }

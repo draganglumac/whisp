@@ -17,8 +17,8 @@
  */
 #include <stdlib.h>
 #include "encryption.h"
-#include <jnxc_headers/jnxmem.h>
-#include <jnxc_headers/jnxbase64.h>
+#include <jnxc_headers/jnxencoder.h>
+#include <jnxc_headers/jnxcheck.h>
 #include <jnxc_headers/jnxlog.h>
 RSA *generate_key(size_t len) {
     srand(time(0));
@@ -40,7 +40,7 @@ char *key_to_string(RSA *keypair,key_type type) {
         break;
     }
     size_t len = BIO_pending(key);
-    char *skey = JNX_MEM_MALLOC(len + 1);
+    char *skey = malloc(len + 1);
     size_t read = BIO_read(key,skey,len);
     skey[read + 1] = '\0';
     BIO_free(key);
@@ -58,11 +58,11 @@ RSA *string_to_key(char *string, key_type type) {
     return rsa;
 }
 char* encrypt_message(RSA *keypair, char *message, size_t *out_encrypted_len) {
-    assert(keypair);
-    assert(message);
-    char *encrypt = JNX_MEM_MALLOC(RSA_size(keypair));
+    JNXCHECK(keypair);
+    JNXCHECK(message);
+    char *encrypt = malloc(RSA_size(keypair));
     bzero(encrypt,RSA_size(keypair));
-    char *err = JNX_MEM_MALLOC(130);
+    char *err = malloc(130);
 
     ///Removing +1 on strlen seems to have an effect...
     if((*out_encrypted_len = RSA_public_encrypt(strlen(message) +1,(unsigned char*)message,
@@ -70,32 +70,46 @@ char* encrypt_message(RSA *keypair, char *message, size_t *out_encrypted_len) {
         ERR_load_crypto_strings();
         ERR_error_string(ERR_get_error(),err);
         printf("%s\n",err);
-        JNX_MEM_FREE(err);
+        free(err);
         return NULL;
     }
-    JNX_MEM_FREE(err);
+    free(err);
     size_t elen;
-    char *encoded = jnx_base64_encode(encrypt,*out_encrypted_len,&elen);
+    
+    jnx_encoder *e = jnx_encoder_create();
+
+    char *encoded = jnx_encoder_b64_encode(e,encrypt,elen,out_encrypted_len);
+    
+    jnx_encoder_destroy(&e); 
+    
     free(encrypt);
     return encoded;
 }
-char *decrypt_message(RSA *keypair, char *encrypted_message, size_t encrypted_message_len, size_t *out_decrypted_len) {
-    assert(keypair);
-    assert(encrypted_message);
-    assert(encrypted_message_len);
+char *decrypt_message(RSA *keypair, char *encrypted, size_t encrypted_message_len, size_t *out_decrypted_len) {
+    JNXCHECK(keypair);
+    JNXCHECK(encrypted);
+    JNXCHECK(encrypted_message_len);
     size_t dlen;
-    encrypted_message = jnx_base64_decode(encrypted_message,strlen(encrypted_message),&dlen);
-    char *decrypt = JNX_MEM_MALLOC(RSA_size(keypair));
+    
+    jnx_encoder *e = jnx_encoder_create();
+    
+    char *encrypted_message = jnx_encoder_b64_decode(e,encrypted,encrypted_message_len,out_decrypted_len);
+
+    jnx_encoder_destroy(&e); 
+    
+
+
+    char *decrypt = malloc(RSA_size(keypair));
     bzero(decrypt,RSA_size(keypair));
-    char *err = JNX_MEM_MALLOC(130);
+    char *err = malloc(130);
     if((*out_decrypted_len = RSA_private_decrypt(encrypted_message_len,(unsigned char*)encrypted_message,(unsigned char*)
                              decrypt,keypair,RSA_PKCS1_OAEP_PADDING)) == -1) {
         ERR_load_crypto_strings();
         ERR_error_string(ERR_get_error(),err);
         printf("%s\n",err);
-        JNX_MEM_FREE(err);
+        free(err);
         return NULL;
     }
-    JNX_MEM_FREE(err);
+    free(err);
     return decrypt;
 }

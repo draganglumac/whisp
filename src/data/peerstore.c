@@ -18,7 +18,6 @@
 #include <stdlib.h>
 #include "peerstore.h"
 #include <jnxc_headers/jnxlist.h>
-#include <jnxc_headers/jnxmem.h>
 #include <jnxc_headers/jnxlog.h>
 #include <jnxc_headers/jnxterm.h>
 #include <jnxc_headers/jnxhash.h>
@@ -137,7 +136,7 @@ void peerstore_delete_peer(raw_peer *rp) {
 	free(rp->port);
 	free(rp->secure_port);
 	free(rp->peerstring);
-	JNX_MEM_FREE(rp);
+	free(rp);
 	jnx_thread_lock(&store_lock);	
 	jnx_btree_remove(store,guid,NULL,NULL); ///is this correct usage???
 	jnx_thread_unlock(&store_lock);	

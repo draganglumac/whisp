@@ -30,7 +30,7 @@ int ipc_incoming_comms(uint8_t *out, size_t len, jnx_unix_socket *s) {
 void ipc_setup(jnx_hashmap *config) {
 
 	configuration = config;
-	JNX_LOGC(JLOG_NORMAL,"Starting Interprocess communications...\n");
+	JNX_LOG(DEFAULT_CONTEXT,"Starting Interprocess communications...\n");
 	jnx_unix_socket *inc_sock = jnx_unix_datagram_socket_create(jnx_hash_get(configuration,"IPC_LISTEN"));
 	jnx_hash_put(configuration,"IPC_LISTEN_SOCK",inc_sock);
 	jnx_unix_datagram_socket_listen(inc_sock,ipc_incoming_comms);

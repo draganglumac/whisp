@@ -21,7 +21,6 @@
 #include <unistd.h>
 
 #include <jnxc_headers/jnxnetwork.h>
-#include <jnxc_headers/jnxmem.h>
 #include "app.h"
 #include "serialization.h"
 #include "discovery.h"
@@ -53,8 +52,12 @@ void resolve_interface_address(jnx_hashmap *config) {
 	if (strcmp(af, "AF_INET6") == 0) {
 		family = AF_INET6;
 	}
-	char *ip = jnx_network_interface_to_string(interface, family);
-	assert(ip);
+
+        char *ip;
+        jnx_network_interface_to_string(&ip,interface, family);
+	
+        
+        assert(ip);
 	printf("Local IP %s for interface %s addressfamily %s\n", ip, interface, af);
 	jnx_hash_put(config, "IP", ip);
 }
@@ -81,13 +84,13 @@ int random_in_range(unsigned int min, unsigned int max) {
 void generate_ports(jnx_hashmap *config) {
 
 	int r = random_in_range(49152,65535);
-	char *buffer = JNX_MEM_MALLOC(56);
+	char *buffer = malloc(56);
 	sprintf(buffer,"%d",r);
 	printf("Adding tcp port %s to map\n",buffer);
 	jnx_hash_put(config,"TPORT",buffer);
 
 	r = random_in_range(41390,51952);
-	char *buffertwo = JNX_MEM_MALLOC(56);
+	char *buffertwo = malloc(56);
 	sprintf(buffertwo,"%d",r);
 	printf("Adding secure socket port %s to map\n",buffertwo);
 	jnx_hash_put(config,"SECUREPORT",buffertwo);
